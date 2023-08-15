@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using static SSH_Configurer_UI.Data.DataTypes;
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">SSH-Configurer-UI</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,25 +12,34 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
+        @foreach (var item in navItemsToDisplay)
+        {
+            <NavItemView menuItem=item></NavItemView>
+        }
     </nav>
 </div>
 
 @code {
+    List<NavMenuItem> navItemsToDisplay = new List<NavMenuItem>()
+    {
+        new NavMenuItem("Devices", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                    new List<NavMenuItem>()
+                    {
+                        new NavMenuItem("Show devices", "devices", 1, "oi oi-list-rich", "oi oi-list-rich", new List<NavMenuItem>()),
+                        new NavMenuItem("Add device", "add-device", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>()),
+                        new NavMenuItem("Remove device", "remove-device", 1, "oi oi-trash", "oi oi-trash", new List<NavMenuItem>())
+                    }
+        ),
+        new NavMenuItem("Groups", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right", 
+                    new List<NavMenuItem>()
+                    {
+                        new NavMenuItem("Show groups", "groups", 1, "oi oi-list-rich", "oi oi-list-rich", new List<NavMenuItem>()),
+                        new NavMenuItem("Add group", "add-group", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>()),
+                        new NavMenuItem("Remove group", "remove-group", 1, "oi oi-trash", "oi oi-trash", new List<NavMenuItem>())
+                    }
+        )
+    };
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;

@@ -1,0 +1,16 @@
+﻿@using static SSH_Configurer_UI.Data.DataTypes;
+
+<tr>
+    <td>@CurrentDevice.Id</td>
+    <td>@CurrentDevice.Name</td>
+    <td>@CurrentDevice.Hostname</td>
+    <td>@CurrentDevice.Port</td>
+    <td>@CurrentDevice.ServerPubKeyId</td>
+    <td>@CurrentDevice.Password</td>
+</tr>
+
+@code {
+
+    [Parameter]
+    public Device CurrentDevice { get; set; }
+}
