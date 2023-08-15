@@ -1,29 +1,4 @@
-.main-option {
-    position: relative;
-}
-
-.sub-options {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #f8f9fa; /* Change as needed */
-    border: 1px solid #ccc;
-    padding: 10px;
-}
-
-.sub-option {
-    display: block;
-    color: #333;
-    text-decoration: none;
-    padding: 5px;
-    transition: background-color 0.2s;
-}
-
-.sub-option:hover {
-    background-color: #ddd; /* Change as needed */
-}
-
-.navbar-toggler {
+﻿.navbar-toggler {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -65,15 +40,15 @@
         line-height: 3rem;
     }
 
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.25);
-    color: white;
-}
+        .nav-item ::deep a.active {
+            background-color: rgba(255,255,255,0.25);
+            color: white;
+        }
 
-.nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
+        .nav-item ::deep a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
 
 @media (min-width: 641px) {
     .navbar-toggler {
@@ -84,7 +59,7 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
-    
+
     .nav-scrollable {
         /* Allow sidebar to scroll for tall menus */
         height: calc(100vh - 3.5rem);

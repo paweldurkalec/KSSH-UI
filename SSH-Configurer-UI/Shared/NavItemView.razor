@@ -1,0 +1,57 @@
+﻿@using static SSH_Configurer_UI.Data.DataTypes;
+
+<div class="nav-item px-3" style="margin-left: @leftMargin;" @onclick=ShowHideSubOptions>
+    @if (@menuItem.href != "none")
+    {
+        <NavLink class="nav-link" href="@menuItem.href">
+            <span class=@icon aria-hidden="true"></span>@menuItem.displayedText
+        </NavLink>
+    }
+    else
+    {
+        <NavLink class="nav-link">
+            <span class=@icon aria-hidden="true"></span>@menuItem.displayedText
+        </NavLink>
+    }
+</div>
+    @if (showSubOptions)
+    {
+        foreach(var item in menuItem.subItems)
+        {
+            <NavItemView menuItem=item></NavItemView>
+        }
+    }
+
+
+@code {
+    [Parameter]
+    public NavMenuItem menuItem { get; set; }
+
+
+    private bool showSubOptions=false;
+    private string icon;
+    private string leftMargin;
+
+    private void ShowHideSubOptions()
+    {
+        if (showSubOptions)
+        {
+            icon = menuItem.iconExpanded;
+            showSubOptions = false;
+        }
+        else
+        {
+            icon = menuItem.iconNotExpanded;
+            showSubOptions = true;
+        }
+
+    }
+
+    protected override void OnInitialized()
+    {
+        icon = menuItem.iconExpanded;
+        leftMargin = (menuItem.depth * 10).ToString() + "px";
+
+        base.OnInitialized();
+    }
+}

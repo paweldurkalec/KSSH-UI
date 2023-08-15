@@ -1,0 +1,54 @@
+﻿@using static SSH_Configurer_UI.Data.DataTypes;
+
+@if (Groups is null)
+{
+    <br />
+    <span>Devices are loading...</span>
+    <br />
+}
+else if (Groups.Count == 0)
+{
+    <br />
+    <span>No devices to display</span>
+    <br />
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Assigned Public Key</th>
+                <th>Number of devices</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var group in Groups)
+            {
+                <tr>
+                    <td>@group.Id</td>
+                    <td>@group.Name</td>
+                    <td>@group.ServerPubKeyId</td>
+                    <td>@getNumberOfDevices()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public List<Group> Groups { get; set; }
+
+    public int getNumberOfDevices()
+    {
+        @if (Groups is null)
+        {
+            return 0;
+        }
+        return Groups.Count;
+    }
+
+}
