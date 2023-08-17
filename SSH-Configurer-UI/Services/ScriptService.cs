@@ -1,4 +1,4 @@
-﻿using static SSH_Configurer_UI.Data.DataTypes;
+﻿using SSH_Configurer_UI.Model;
 
 namespace SSH_Configurer_UI.Services
 {

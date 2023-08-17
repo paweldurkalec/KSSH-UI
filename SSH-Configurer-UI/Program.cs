@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using SSH_Configurer_UI.Data;
+using SSH_Configurer_UI.Model;
 using SSH_Configurer_UI.Services;
 
 namespace SSH_Configurer_UI
