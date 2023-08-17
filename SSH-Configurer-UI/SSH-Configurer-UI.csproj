@@ -9,7 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="foolproof" Version="0.9.4518" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\List\" />
+    <Folder Include="Pages\Update\" />
   </ItemGroup>
 
 </Project>

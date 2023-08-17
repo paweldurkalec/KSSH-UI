@@ -1,27 +1,27 @@
-﻿@using static SSH_Configurer_UI.Data.DataTypes;
+﻿@using SSH_Configurer_UI.Model;
 
 <div class="nav-item px-3" style="margin-left: @leftMargin;" @onclick=ShowHideSubOptions>
-    @if (@menuItem.href != "none")
+    @if (@menuItem.Href != "none")
     {
-        <NavLink class="nav-link" href="@menuItem.href">
-            <span class=@icon aria-hidden="true"></span>@menuItem.displayedText
+        <NavLink class="nav-link" href="@menuItem.Href">
+            <span class=@icon aria-hidden="true"></span>@menuItem.DisplayedText
         </NavLink>
     }
     else
     {
         <NavLink class="nav-link">
-            <span class=@icon aria-hidden="true"></span>@menuItem.displayedText
+            <span class=@icon aria-hidden="true"></span>@menuItem.DisplayedText
         </NavLink>
     }
 </div>
     @if (showSubOptions)
     {
-        foreach(var item in menuItem.subItems)
+        foreach(var item in menuItem.SubItems)
         {
             <NavItemView menuItem=item></NavItemView>
         }
     }
-
+    
 
 @code {
     [Parameter]
@@ -36,12 +36,12 @@
     {
         if (showSubOptions)
         {
-            icon = menuItem.iconExpanded;
+            icon = menuItem.IconExpanded;
             showSubOptions = false;
         }
         else
         {
-            icon = menuItem.iconNotExpanded;
+            icon = menuItem.IconNotExpanded;
             showSubOptions = true;
         }
 
@@ -49,8 +49,8 @@
 
     protected override void OnInitialized()
     {
-        icon = menuItem.iconExpanded;
-        leftMargin = (menuItem.depth * 10).ToString() + "px";
+        icon = menuItem.IconExpanded;
+        leftMargin = (menuItem.Depth * 10).ToString() + "px";
 
         base.OnInitialized();
     }
