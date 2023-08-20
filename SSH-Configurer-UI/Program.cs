@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SSH_Configurer_UI.Model;
 using SSH_Configurer_UI.Services;
+using Syncfusion.Blazor;
 
 namespace SSH_Configurer_UI
 {
@@ -18,6 +19,7 @@ namespace SSH_Configurer_UI
             builder.Services.AddSingleton<GroupService>();
             builder.Services.AddSingleton<ScriptService>();
             builder.Services.AddSingleton<PublicKeyService>();
+            builder.Services.AddSyncfusionBlazor();
 
             var app = builder.Build();
 

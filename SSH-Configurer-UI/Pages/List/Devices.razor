@@ -4,7 +4,7 @@
 @using SSH_Configurer_UI.Services;
 @inject DeviceService deviceService;
 
-<DeviceList Devices="devices"></DeviceList>
+<DeviceList Devices="devices" DeleteCurrentDevice="DeleteDevice"></DeviceList>
 
 @code {
     private List<Device> devices;
@@ -14,5 +14,10 @@
         devices = deviceService.GetAllDevices();
 
         await base.OnInitializedAsync();
+    }
+
+    private void DeleteDevice(Device device)
+    {
+        deviceService.RemoveDevice(device);
     }
 }

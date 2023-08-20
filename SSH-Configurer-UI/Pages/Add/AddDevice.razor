@@ -77,15 +77,7 @@
 
     private void ResetFeedback()
     {   
-        if(device.Password == "" && device.ServerPubKeyId == -1)
-        {
-            feedback = "Provide password or public key";
-            color = "red";
-        }
-        else
-        {
-            feedback = "";
-            color = "";
-        }     
+        feedback = "";
+        color = "";    
     }
 }
