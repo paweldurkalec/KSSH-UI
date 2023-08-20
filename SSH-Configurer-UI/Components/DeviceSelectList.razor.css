@@ -1,0 +1,33 @@
+﻿.table {
+    width: 360px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+    .table tbody {
+        display: block;
+        width: 100%;
+        overflow: auto;
+        height: 300px;
+    }
+
+    .table thead tr {
+        display: block;
+    }
+
+    .table thead {
+        background: black;
+        color: #fff;
+    }
+
+    .table th,
+    .table td {
+        padding: 5px;
+        text-align: left;
+        width: 190px;
+    }
+
+.selected-row {
+    background-color: #f0f0f0;
+    transition: background-color 0.2s;
+}

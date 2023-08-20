@@ -9,12 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.3.1" />
     <PackageReference Include="foolproof" Version="0.9.4518" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+    <PackageReference Include="Syncfusion.Blazor" Version="22.2.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\List\" />
     <Folder Include="Pages\Update\" />
   </ItemGroup>
 

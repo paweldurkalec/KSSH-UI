@@ -13,36 +13,45 @@ else if(Devices.Count == 0)
     <br />
 }
 else{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Hostname</th>
-                <th>Port</th>
-                <th>Assigned Public Key</th>
-                <th>Password</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var device in Devices)
-            {
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
                 <tr>
-                    <td>@device.Id</td>
-                    <td>@device.Name</td>
-                    <td>@device.Hostname</td>
-                    <td>@device.Port</td>
-                    <td>@device.ServerPubKeyId</td>
-                    <td>@device.Password</td>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Hostname</th>
+                    <th>Port</th>
+                    <th>Assigned Key</th>
+                    <th>Password</th>
+                    <th>Remove</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead >
+            <tbody>
+                @foreach (var device in Devices)
+                {
+                    <tr>
+                        <td>@device.Id</td>
+                        <td>@device.Name</td>
+                        <td>@device.Hostname</td>
+                        <td>@device.Port</td>
+                        <td>@device.ServerPubKeyId</td>
+                        <td>@device.Password</td>
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-trash" @onclick="() =>DeleteCurrentDevice.InvokeAsync(device)"></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
 
     [Parameter]
     public List<Device> Devices { get; set; }
+
+    [Parameter]
+    public EventCallback<Device> DeleteCurrentDevice { get; set; }
 
 }
