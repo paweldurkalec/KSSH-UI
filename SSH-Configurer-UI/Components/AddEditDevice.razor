@@ -1,18 +1,15 @@
-﻿@page "/add-device"
-@using SSH_Configurer_UI.Model;
+﻿@using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
-@inject DeviceService deviceService
 @inject KeyPairService keyService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
-
-@* <EditForm Model="@device" OnValidSubmit="@SaveDevice">
-    <DataAnnotationsValidator/>
+<EditForm Model="@device" OnValidSubmit="@save">
+    <DataAnnotationsValidator />
 
     <div>Name:</div>
-    <ValidationMessage For="(() => device.Name)"/>
+    <ValidationMessage For="(() => device.Name)" />
     <InputText class="form-control" placeholder="Name" @bind-Value="@device.Name"></InputText><br />
 
     <div>Hostname:</div>
@@ -46,52 +43,35 @@
     <InputText class="form-control" placeholder="Password" @bind-Value="@device.Password" type="password"></InputText><br />
 
     <div style="color: @color">@feedback</div><br />
-    <button onclick="@ResetFeedback" class="btn btn-primary" type="submit">Save device</button>
-</EditForm> *@
-
-<AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
+    <button onclick="@reset" class="btn btn-primary" type="submit">Save device</button>
+</EditForm>
 
 @code {
-    private Device device;
-    List<KeyPair> keys;
-    string feedback = "";
-    string color = "";
+    [Parameter]
+    public Device device { get; set; }
 
-    protected override void OnInitialized()
+    [Parameter]
+    public List<KeyPair> keys { get; set; }
+
+    [Parameter]
+    public EventCallback saveDevice { get; set; }
+
+    [Parameter]
+    public EventCallback resetFeedback { get; set; }
+
+    [Parameter]
+    public string color { get; set; }
+
+    [Parameter]
+    public string feedback { get; set; }
+
+    private void save()
     {
-        base.OnInitialized();
-        device = new Device();
-        device.KeyPairId = 0;
-        keys = keyService.GetAllKeys();
+        saveDevice.InvokeAsync();
     }
 
-    private void SaveDevice()
+    private void reset()
     {
-        int response = deviceService.AddDevice(new Device
-            {
-                Name = device.Name,
-                Hostname = device.Hostname,
-                Port = device.Port,
-                Username = device.Username,
-                KeyPairId = device.KeyPairId,
-                Password = device.Password
-            });
-        if(response == 0)
-        {
-            device = new Device();
-            feedback = "Device added successfully.";
-            color = "green";
-        }
-        else
-        {
-            feedback = "Adding failed.";
-            color = "red";
-        }
-    }
-
-    private void ResetFeedback()
-    {   
-        feedback = "";
-        color = "";    
+        resetFeedback.InvokeAsync();
     }
 }

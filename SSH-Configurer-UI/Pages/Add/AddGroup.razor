@@ -4,7 +4,7 @@
 @using SSH_Configurer_UI.Services
 @using Syncfusion.Blazor.Grids
 @inject GroupService groupService
-@inject PublicKeyService keyService
+@inject KeyPairService keyService
 @inject DeviceService deviceService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
@@ -15,8 +15,8 @@
     <div>Name:</div>
     <ValidationMessage For="(() => group.Name)" />
     <InputText class="form-control" placeholder="Name" @bind-Value="@group.Name"></InputText><br />
-    <div>Server Public Key:</div>
-    <InputSelect class="form-control" TValue="int" @bind-Value="@group.ServerPubKeyId">
+    <div>Default key pair ID:</div>
+    <InputSelect class="form-control" TValue="int" @bind-Value="@group.KeyPairId">
         @if (keys.Count > 0)
         {
             @foreach (var key in keys)
@@ -29,11 +29,11 @@
             <option value=-1>No keys found!</option>
         }
     </InputSelect><br />
-    <div>Assigned devices:</div><br />
+    <div>Assigned devices: </div><br />
     <div class="bg-blue-100">
         <input class="border-4 w-1/3 rounded m-6 p-6 h-8
                border-blue-300" @bind-value="searchText"
-        @bind-value:event="oninput" placeholder="Search by title" />
+        @bind-value:event="oninput" placeholder="Search by name" />
     </div><br />
     <DeviceSelectList Devices="selectedDevices"></DeviceSelectList>
     <div style="color: @color">@feedback</div><br />
@@ -42,7 +42,7 @@
 
 @code {
     private Group group;
-    List<PublicKey> keys;
+    List<KeyPair> keys;
     List<DeviceSelect> devices;
     string searchText = "";
     string deviceIdsString = "";
@@ -65,7 +65,7 @@
         int response = groupService.AddGroup(new Group
             {
                 Name = group.Name,
-                ServerPubKeyId = group.ServerPubKeyId,
+                KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
             });
 

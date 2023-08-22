@@ -21,7 +21,8 @@ else{
                     <th>Name</th>
                     <th>Hostname</th>
                     <th>Port</th>
-                    <th>Assigned Key</th>
+                    <th>Username</th>
+                    <th>Key Pair Id</th>
                     <th>Password</th>
                     <th>Remove</th>
                 </tr>
@@ -34,7 +35,8 @@ else{
                         <td>@device.Name</td>
                         <td>@device.Hostname</td>
                         <td>@device.Port</td>
-                        <td>@device.ServerPubKeyId</td>
+                        <td>@device.Username</td>
+                        <td>@device.KeyPairId</td>
                         <td>@device.Password</td>
                         <td style="padding-left: 20px">
                             <button class="oi oi-trash" @onclick="() =>DeleteCurrentDevice.InvokeAsync(device)"></button>

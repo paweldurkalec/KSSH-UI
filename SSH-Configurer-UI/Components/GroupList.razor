@@ -14,27 +14,29 @@ else if (Groups.Count == 0)
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Assigned Public Key</th>
-                <th>Number of devices</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var group in Groups)
-            {
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
                 <tr>
-                    <td>@group.Id</td>
-                    <td>@group.Name</td>
-                    <td>@group.ServerPubKeyId</td>
-                    <td>@getNumberOfDevices()</td>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Assigned Public Key</th>
+                    <th>Number of devices</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var group in Groups)
+                {
+                    <tr>
+                        <td>@group.Id</td>
+                        <td>@group.Name</td>
+                        <td>@group.KeyPairId</td>
+                        <td>@getNumberOfDevices()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
