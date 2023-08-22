@@ -47,18 +47,21 @@ namespace SSH_Configurer_UI.Model
         public string Hostname { get; set; }
         [Range(0, 65535, ErrorMessage = "Port must be from range (0,65535)")]
         public int Port { get; set; } = 22;
+        [Required]
+        public string Username { get; set; }
         //[RequiredIf("Password", "", "ServerPubKeyId is required when Password is empty.")]
-        public int ServerPubKeyId { get; set; } = -1;
+        public int KeyPairId { get; set; } = -1;
         //[RequiredIf("ServerPubKeyId", -1, "Password is required when ServerPubKeyId is -1.")]
         public string Password { get; set; } = "";
         public Device() { }
-        public Device(int id, string name, string hostname, int port, int serverPubKeyId, string password)
+        public Device(int id, string name, string hostname, int port, string username, int keyPairId, string password)
         {
             Id = id;
             Name = name;
             Hostname = hostname;
             Port = port;
-            ServerPubKeyId = serverPubKeyId;
+            Username = username;
+            KeyPairId = keyPairId;
             Password = password;
         }
     }

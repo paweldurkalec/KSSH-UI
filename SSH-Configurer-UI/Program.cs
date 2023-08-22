@@ -18,7 +18,7 @@ namespace SSH_Configurer_UI
             builder.Services.AddSingleton<DeviceService>();
             builder.Services.AddSingleton<GroupService>();
             builder.Services.AddSingleton<ScriptService>();
-            builder.Services.AddSingleton<PublicKeyService>();
+            builder.Services.AddSingleton<KeyPairService>();
             builder.Services.AddSyncfusionBlazor();
 
             var app = builder.Build();
