@@ -7,48 +7,6 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
-
-@* <EditForm Model="@device" OnValidSubmit="@SaveDevice">
-    <DataAnnotationsValidator/>
-
-    <div>Name:</div>
-    <ValidationMessage For="(() => device.Name)"/>
-    <InputText class="form-control" placeholder="Name" @bind-Value="@device.Name"></InputText><br />
-
-    <div>Hostname:</div>
-    <ValidationMessage For="(() => device.Hostname)" />
-    <InputText class="form-control" placeholder="Hostname" @bind-Value="@device.Hostname"></InputText><br />
-
-    <div>Port:</div>
-    <ValidationMessage For="(() => device.Port)" />
-    <InputNumber class="form-control" placeholder="Port" @bind-Value="@device.Port"></InputNumber><br />
-
-    <div>Username:</div>
-    <ValidationMessage For="(() => device.Username)" />
-    <InputText class="form-control" placeholder="Username" @bind-Value="@device.Username"></InputText><br />
-
-    <div>Key pair ID (optional):</div>
-    <InputSelect class="form-control" TValue="int" @bind-Value="@device.KeyPairId">
-        @if (keys.Count > 0)
-        {
-            @foreach (var key in keys)
-            {
-                <option value=@key.Id>@key.Name</option>
-            }
-        }
-        else
-        {
-            <option value=-1>No keys found!</option>
-        }
-    </InputSelect><br />
-
-    <div>Password (optional):</div>
-    <InputText class="form-control" placeholder="Password" @bind-Value="@device.Password" type="password"></InputText><br />
-
-    <div style="color: @color">@feedback</div><br />
-    <button onclick="@ResetFeedback" class="btn btn-primary" type="submit">Save device</button>
-</EditForm> *@
-
 <AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
 
 @code {

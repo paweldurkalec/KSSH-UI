@@ -24,6 +24,7 @@ else{
                     <th>Username</th>
                     <th>Key Pair Id</th>
                     <th>Password</th>
+                    <th>Update</th>
                     <th>Remove</th>
                 </tr>
             </thead >
@@ -39,7 +40,10 @@ else{
                         <td>@device.KeyPairId</td>
                         <td>@device.Password</td>
                         <td style="padding-left: 20px">
-                            <button class="oi oi-trash" @onclick="() =>DeleteCurrentDevice.InvokeAsync(device)"></button>
+                            <button class="oi oi-wrench" @onclick="()=>UpdateCurrentDevice.InvokeAsync(device.Id)"></button>
+                        </td>
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-trash" @onclick="()=>DeleteCurrentDevice.InvokeAsync(device)"></button>
                         </td>
                     </tr>
                 }
@@ -56,4 +60,6 @@ else{
     [Parameter]
     public EventCallback<Device> DeleteCurrentDevice { get; set; }
 
+    [Parameter]
+    public EventCallback<int> UpdateCurrentDevice { get; set; }
 }

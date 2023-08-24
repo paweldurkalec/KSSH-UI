@@ -3,8 +3,9 @@
 @using SSH_Configurer_UI.Components;
 @using SSH_Configurer_UI.Services;
 @inject DeviceService deviceService;
+@inject NavigationManager navManager;
 
-<DeviceList Devices="devices" DeleteCurrentDevice="DeleteDevice"></DeviceList>
+<DeviceList Devices="devices" DeleteCurrentDevice="DeleteDevice" UpdateCurrentDevice="UpdateDevice"></DeviceList>
 
 @code {
     private List<Device> devices;
@@ -19,5 +20,10 @@
     private void DeleteDevice(Device device)
     {
         deviceService.RemoveDevice(device);
+    }
+
+    private void UpdateDevice(int id)
+    {
+        navManager.NavigateTo($"./update-device/{id}");
     }
 }

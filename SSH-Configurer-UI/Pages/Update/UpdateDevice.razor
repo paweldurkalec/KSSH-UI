@@ -1,0 +1,71 @@
+﻿@page "/update-device/{deviceId}"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@inject DeviceService deviceService
+@inject KeyPairService keyService
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+@if(device is null)
+{
+    <div style="color: @stateColor">@stateMessage</div>
+}
+else
+{
+    <AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
+}
+
+@code {
+    [Parameter]
+    public string deviceId { get; set; }
+    private Device? device = null;
+    List<KeyPair> keys;
+    string feedback = "";
+    string color = "";
+    string stateMessage = "Loading...";
+    string stateColor = "green";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized(); 
+        device = deviceService.GetById(int.Parse(deviceId));
+        if(device is null)
+        {
+            stateMessage = "Device not found!";
+            stateColor = "red";
+        }
+        keys = keyService.GetAllKeys();
+    }
+
+    private void SaveDevice()
+    {
+        int response = deviceService.UpdateDevice(int.Parse(deviceId), new Device
+            {
+                Id = device.Id,
+                Name = device.Name,
+                Hostname = device.Hostname,
+                Port = device.Port,
+                Username = device.Username,
+                KeyPairId = device.KeyPairId,
+                Password = device.Password
+            });
+        if (response == 0)
+        {
+            device = deviceService.GetById(int.Parse(deviceId));
+            feedback = "Device updated successfully.";
+            color = "green";
+        }
+        else
+        {
+            feedback = "Updating failed.";
+            color = "red";
+        }
+    }
+
+    private void ResetFeedback()
+    {
+        feedback = "";
+        color = "";
+    }
+}

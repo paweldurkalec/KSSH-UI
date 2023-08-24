@@ -1,4 +1,4 @@
-﻿@page "/add-group"
+﻿@page "/update-group/{groupId}"
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
@@ -9,32 +9,55 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
-<AddEditGroup @bind-searchText="@searchText" @bind-searchText:event="ValueChanged" group="@group" searchedDevices="@searchedDevices" resetFeedback="@ResetFeedback" saveDevice="@SaveGroup" keys="@keys" color="@color" feedback="@feedback"></AddEditGroup>
+@if(group is null)
+{
+    <div style="color: @stateColor">@stateMessage</div>
+}
+else
+{
+<AddEditGroup @bind-searchText="@searchText" @bind-searchText:event="ValueChanged" group="@group" searchedDevices="@searchedDevices" resetFeedback="@ResetFeedback" saveDevice="@UpdateCurrentGroup" keys="@keys" color="@color" feedback="@feedback"></AddEditGroup>
+}
 
 @code {
-    private Group group;
+    [Parameter]
+    public string groupId { get; set; }
+    private Group? group = null;
     List<KeyPair> keys;
     List<DeviceSelect> devices;
     string searchText = "";
     string deviceIdsString = "";
     string feedback = "";
     string color = "";
+    string stateMessage = "Loading...";
+    string stateColor = "green";
     List<DeviceSelect> searchedDevices => devices.Where(device => device.Name.ToLower().Contains(searchText.ToLower())).ToList();
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        group = new Group();
+        group = groupService.GetById(int.Parse(groupId));
+        if (group is null)
+        {
+            stateMessage = "Group not found!";
+            stateColor = "red";
+        }
         keys = keyService.GetAllKeys();
         devices = deviceService.GetAllDevices().Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds);
+        List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();
+        foreach(DeviceSelect device in devicesToPreSelect)
+        {
+            device.IsSelected = true;
+        }
     }
 
-    private void SaveGroup()
+    private void UpdateCurrentGroup()
     {
         List<int> deviceIds = devices.Where(device => device.IsSelected == true).Select(device => device.Id).ToList();
 
-        int response = groupService.AddGroup(new Group
+        int response = groupService.UpdateGroup(int.Parse(groupId), new Group
             {
+                Id = group.Id,
                 Name = group.Name,
                 KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
@@ -42,7 +65,7 @@
 
         if (response == 0)
         {
-            group = new Group();
+            group = groupService.GetById(int.Parse(groupId));
             devices.ForEach(device => device.IsSelected = false);
             feedback = "Group added successfully.";
             color = "green";
