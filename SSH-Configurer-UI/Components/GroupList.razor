@@ -22,6 +22,8 @@ else
                     <th>Name</th>
                     <th>Assigned Public Key</th>
                     <th>Number of devices</th>
+                    <th>Update</th>
+                    <th>Remove</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +34,12 @@ else
                         <td>@group.Name</td>
                         <td>@group.KeyPairId</td>
                         <td>@getNumberOfDevices()</td>
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-wrench" @onclick="()=>UpdateCurrentGroup.InvokeAsync(group.Id)"></button>
+                        </td>
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-trash" @onclick="()=>DeleteCurrentGroup.InvokeAsync(group)"></button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -43,6 +51,12 @@ else
 
     [Parameter]
     public List<Group> Groups { get; set; }
+
+    [Parameter]
+    public EventCallback<Group> DeleteCurrentGroup { get; set; }
+
+    [Parameter]
+    public EventCallback<int> UpdateCurrentGroup { get; set; }
 
     public int getNumberOfDevices()
     {

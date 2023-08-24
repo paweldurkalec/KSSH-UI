@@ -3,8 +3,9 @@
 @using SSH_Configurer_UI.Components;
 @using SSH_Configurer_UI.Services;
 @inject GroupService groupService;
+@inject NavigationManager navManager;
 
-<GroupList Groups="groups"></GroupList>
+<GroupList Groups="groups" DeleteCurrentGroup="DeleteGroup" UpdateCurrentGroup="UpdateGroup"></GroupList>
 
 @code {
     private List<Group> groups;
@@ -14,5 +15,15 @@
         groups = groupService.GetAllGroups();
 
         await base.OnInitializedAsync();
+    }
+
+    private void DeleteGroup(Group device)
+    {
+        groupService.RemoveGroup(device);
+    }
+
+    private void UpdateGroup(int id)
+    {
+        navManager.NavigateTo($"./update-group/{id}");
     }
 }

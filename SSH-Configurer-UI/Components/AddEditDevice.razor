@@ -5,7 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
-<EditForm Model="@device" OnValidSubmit="@save">
+<EditForm Model="@device" OnValidSubmit="@Save">
     <DataAnnotationsValidator />
 
     <div>Name:</div>
@@ -43,7 +43,7 @@
     <InputText class="form-control" placeholder="Password" @bind-Value="@device.Password" type="password"></InputText><br />
 
     <div style="color: @color">@feedback</div><br />
-    <button onclick="@reset" class="btn btn-primary" type="submit">Save device</button>
+    <button onclick="@Reset" class="btn btn-primary" type="submit">Save device</button>
 </EditForm>
 
 @code {
@@ -65,12 +65,12 @@
     [Parameter]
     public string feedback { get; set; }
 
-    private void save()
+    private void Save()
     {
         saveDevice.InvokeAsync();
     }
 
-    private void reset()
+    private void Reset()
     {
         resetFeedback.InvokeAsync();
     }

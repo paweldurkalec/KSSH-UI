@@ -15,8 +15,4 @@
     <PackageReference Include="Syncfusion.Blazor" Version="22.2.9" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Update\" />
-  </ItemGroup>
-
 </Project>

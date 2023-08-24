@@ -1,5 +1,6 @@
 ﻿using SSH_Configurer_UI.Model;
 using SSH_Configurer_UI.Pages;
+using SSH_Configurer_UI.Pages.List;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SSH_Configurer_UI.Services
@@ -18,6 +19,11 @@ namespace SSH_Configurer_UI.Services
             return Groups;
         }
 
+        public Group? GetById(int id)
+        {
+            return Groups.FirstOrDefault(group => group.Id == id, null);
+        }
+
         public List<Group> SearchByName(string input)
         {
             List<Group> filtered = Groups.Where(group => group.Name.ToLower().Contains(input.ToLower())).ToList();
@@ -25,9 +31,26 @@ namespace SSH_Configurer_UI.Services
             return filtered;
         }
 
+        public int UpdateGroup(int id, Group group)
+        {
+            int index = Groups.IndexOf(Groups.FirstOrDefault(group => group.Id == id));
+            if (index != -1)
+            {
+                Groups[index] = group;
+                return 0;
+            }
+            return -1;
+        }
+
         public int AddGroup(Group group)
         {
             Groups.Add(group);
+            return 0;
+        }
+
+        public int RemoveGroup(Group group)
+        {
+            Groups.Remove(group);
             return 0;
         }
     }
