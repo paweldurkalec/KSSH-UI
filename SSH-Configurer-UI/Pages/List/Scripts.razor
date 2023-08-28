@@ -1,0 +1,30 @@
+﻿@page "/scripts"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components;
+@using SSH_Configurer_UI.Services;
+@inject ScriptService scriptService;
+@inject NavigationManager navManager;
+
+<ScriptList Scripts="scripts" DeleteCurrentScript="DeleteScript" UpdateCurrentScript="UpdateScript"></ScriptList>
+
+@code {
+    private List<Script> scripts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        scripts = scriptService.GetAllScripts();
+
+        await base.OnInitializedAsync();
+    }
+
+    private void DeleteScript(Script script)
+    {
+        scriptService.RemoveScript(script);
+        scripts = scriptService.GetAllScripts();
+    }
+
+    private void UpdateScript(int id)
+    {
+        navManager.NavigateTo($"./update-script/{id}");
+    }
+}

@@ -1,0 +1,65 @@
+﻿@page "/update-script/{scriptId}"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@inject ScriptService scriptService
+@inject KeyPairService keyService
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (script is null)
+{
+    <div style="color: @stateColor">@stateMessage</div>
+}
+else
+{
+    <AddEditScript script="@script" resetFeedback="@ResetFeedback" saveScript="@SaveScript" color="@color" feedback="@feedback"></AddEditScript>
+}
+
+@code {
+    [Parameter]
+    public string scriptId { get; set; }
+    private Script? script = null;
+    string feedback = "";
+    string color = "";
+    string stateMessage = "Loading...";
+    string stateColor = "green";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        script = scriptService.GetById(int.Parse(scriptId));
+        if (script is null)
+        {
+            stateMessage = "Script not found!";
+            stateColor = "red";
+        }
+    }
+
+    private void SaveScript()
+    {
+        int response = scriptService.UpdateScript(int.Parse(scriptId), new Script
+            {
+                Id = script.Id,
+                Name = script.Name,
+                Content = script.Content,
+            });
+        if (response == 0)
+        {
+            script = scriptService.GetById(int.Parse(scriptId));
+            feedback = "Script updated successfully.";
+            color = "green";
+        }
+        else
+        {
+            feedback = "Updating failed.";
+            color = "red";
+        }
+    }
+
+    private void ResetFeedback()
+    {
+        feedback = "";
+        color = "";
+    }
+}
