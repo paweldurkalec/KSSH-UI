@@ -1,0 +1,47 @@
+﻿@page "/add-script"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@inject ScriptService scriptService
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<AddEditScript script="@script" resetFeedback="@ResetFeedback" saveScript="@SaveScript" color="@color" feedback="@feedback"></AddEditScript>
+
+@code {
+    private Script script;
+    string feedback = "";
+    string color = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        script = new Script();
+    }
+
+    private void SaveScript()
+    {
+        int response = scriptService.AddScript(new Script
+            {
+                Name = script.Name,
+                Content = script.Content
+            });
+        if (response == 0)
+        {
+            script = new Script();
+            feedback = "Script added successfully.";
+            color = "green";
+        }
+        else
+        {
+            feedback = "Adding failed.";
+            color = "red";
+        }
+    }
+
+    private void ResetFeedback()
+    {
+        feedback = "";
+        color = "";
+    }
+}

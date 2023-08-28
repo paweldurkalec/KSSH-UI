@@ -1,0 +1,54 @@
+﻿@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@script" OnValidSubmit="@Save">
+    <DataAnnotationsValidator />
+
+    <div>Name:</div>
+    <ValidationMessage For="(() => script.Name)" />
+    <InputText class="form-control" placeholder="Name" @bind-Value="@script.Name"></InputText><br />
+
+    <div>Content:</div>
+    <ValidationMessage For="(() => script.Content)" />
+    <InputTextArea class="form-control custom-textarea" placeholder="Content" @bind-Value="@script.Content"></InputTextArea><br />
+
+    <div style="color: @color">@feedback</div><br />
+    <button onclick="@Reset" class="btn btn-primary" type="submit">Save script</button>
+</EditForm>
+
+<style>
+    .custom-textarea {
+        height: 500px; /* Set the initial height */
+        resize: vertical;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Script script { get; set; }
+
+    [Parameter]
+    public EventCallback saveScript { get; set; }
+
+    [Parameter]
+    public EventCallback resetFeedback { get; set; }
+
+    [Parameter]
+    public string color { get; set; }
+
+    [Parameter]
+    public string feedback { get; set; }
+
+    private void Save()
+    {
+        saveScript.InvokeAsync();
+    }
+
+    private void Reset()
+    {
+        resetFeedback.InvokeAsync();
+    }
+}
