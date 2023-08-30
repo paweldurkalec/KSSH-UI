@@ -20,7 +20,7 @@
         base.OnInitialized();
         device = new Device();
         device.KeyPairId = 0;
-        keys = keyService.GetAllKeys();
+        keys = keyService.GetAllKeyPairs();
     }
 
     private void SaveDevice()
