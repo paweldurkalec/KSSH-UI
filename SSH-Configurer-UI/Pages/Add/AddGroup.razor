@@ -25,7 +25,7 @@
     {
         base.OnInitialized();
         group = new Group();
-        keys = keyService.GetAllKeys();
+        keys = keyService.GetAllKeyPairs();
         devices = deviceService.GetAllDevices().Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
     }
 

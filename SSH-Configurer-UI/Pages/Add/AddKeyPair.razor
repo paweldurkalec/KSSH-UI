@@ -1,0 +1,49 @@
+﻿@page "/add-keyPair"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@inject KeyPairService keyPairService
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<AddEditKeyPair keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></AddEditKeyPair>
+
+@code {
+    private KeyPair keyPair;
+    string feedback = "";
+    string color = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        keyPair = new KeyPair();
+    }
+
+    private void SaveKeyPair()
+    {
+        int response = keyPairService.AddKeyPair(new KeyPair
+            {
+                Id = keyPair.Id,
+                Name = keyPair.Name,
+                PublicKey = keyPair.PublicKey,
+                PrivateKey = keyPair.PrivateKey
+            });
+        if (response == 0)
+        {
+            keyPair = new KeyPair();
+            feedback = "KeyPair added successfully.";
+            color = "green";
+        }
+        else
+        {
+            feedback = "Adding failed.";
+            color = "red";
+        }
+    }
+
+    private void ResetFeedback()
+    {
+        feedback = "";
+        color = "";
+    }
+}

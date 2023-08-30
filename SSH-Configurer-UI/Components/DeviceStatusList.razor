@@ -1,0 +1,42 @@
+﻿@using SSH_Configurer_UI.Model;
+
+@if (Devices is null)
+{
+    <br />
+    <span>Devices are loading...</span>
+    <br />
+}
+else if (Devices.Count == 0)
+{
+    <br />
+    <span>No devices to display</span>
+    <br />
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Hostname</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in Devices)
+            {
+               <tr>
+                    <td>@device.Name</td>
+                    <td>@device.Hostname</td>
+                    <td>@device.Status</td>
+               </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public List<DeviceStatus> Devices { get; set; }
+}

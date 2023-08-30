@@ -41,7 +41,7 @@ else
             stateMessage = "Group not found!";
             stateColor = "red";
         }
-        keys = keyService.GetAllKeys();
+        keys = keyService.GetAllKeyPairs();
         devices = deviceService.GetAllDevices().Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
         List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds);
         List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();

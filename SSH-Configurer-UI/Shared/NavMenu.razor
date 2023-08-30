@@ -22,11 +22,12 @@
 @code {
     List<NavMenuItem> navItemsToDisplay = new List<NavMenuItem>()
     {
-        new NavMenuItem("Scripts", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+        new NavMenuItem("Run script", "run-script", 0, "oi oi-target", "oi oi-target", new List<NavMenuItem>()),
+        new NavMenuItem("Groups", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
                     new List<NavMenuItem>()
                     {
-                        new NavMenuItem("Show scripts", "scripts", 1, "oi oi-script", "oi oi-script", new List<NavMenuItem>()),
-                        new NavMenuItem("Add script", "add-script", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        new NavMenuItem("Show groups", "groups", 1, "oi oi-grid-four-up", "oi oi-grid-four-up", new List<NavMenuItem>()),
+                        new NavMenuItem("Add group", "add-group", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
                     }
         ),
         new NavMenuItem("Devices", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
@@ -36,11 +37,18 @@
                         new NavMenuItem("Add device", "add-device", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
                     }
         ),
-        new NavMenuItem("Groups", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right", 
+        new NavMenuItem("Scripts", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
                     new List<NavMenuItem>()
                     {
-                        new NavMenuItem("Show groups", "groups", 1, "oi oi-grid-four-up", "oi oi-grid-four-up", new List<NavMenuItem>()),
-                        new NavMenuItem("Add group", "add-group", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        new NavMenuItem("Show scripts", "scripts", 1, "oi oi-script", "oi oi-script", new List<NavMenuItem>()),
+                        new NavMenuItem("Add script", "add-script", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                    }
+        ),
+        new NavMenuItem("Keys", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                    new List<NavMenuItem>()
+                    {
+                        new NavMenuItem("Show keys", "keyPairs", 1, "oi oi-key", "oi oi-key", new List<NavMenuItem>()),
+                        new NavMenuItem("Add key pair", "add-keyPair", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
                     }
         )
     };

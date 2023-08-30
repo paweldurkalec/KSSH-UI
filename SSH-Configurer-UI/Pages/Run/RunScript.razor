@@ -1,0 +1,85 @@
+﻿@page "/run-script"
+@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@inject GroupService groupService
+@inject DeviceService deviceService
+@inject ScriptService scriptService
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@configurationProcess" OnValidSubmit="@Run">
+    <div>Group of devices:</div>
+    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId">
+        @if (allGroups.Count > 0)
+        {
+            @foreach (var group in allGroups)
+            {
+                <option value=@group.Id>@group.Name</option>
+            }
+        }
+        else
+        {
+            <option value=-1>No groups found!</option>
+        }
+    </InputSelect><br />
+
+    <div>Script to run:</div>
+    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.ScriptId">
+        @if (allScripts.Count > 0)
+        {
+            @foreach (var script in allScripts)
+            {
+                <option value=@script.Id>@script.Name</option>
+            }
+        }
+        else
+        {
+            <option value=-1>No scripts found!</option>
+        }
+    </InputSelect><br />
+
+    <div style="color: @color">@feedback</div><br />
+    <button onclick="@ResetFeedback" class="btn btn-primary" type="submit">Run</button>
+</EditForm>
+
+@if(devicesBeingConfigured.Count > 0)
+{
+    <br />
+    <br />
+    <DeviceStatusList Devices="@devicesBeingConfigured"></DeviceStatusList>
+}
+
+@code {
+    ConfigurationProcess configurationProcess;
+    List<Group> allGroups;
+    List<Script> allScripts;
+    List<DeviceStatus> devicesBeingConfigured;
+    string feedback = "";
+    string color = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        configurationProcess = new(-1,-1, "new");
+        devicesBeingConfigured = new();
+        allGroups = groupService.GetAllGroups();
+        allScripts = scriptService.GetAllScripts();
+    }
+
+    private void Run()
+    {
+
+        if (configurationProcess.ScriptId != -1 && configurationProcess.GroupId != -1){
+            Group selectedGroup = groupService.GetById(configurationProcess.GroupId);
+            devicesBeingConfigured = deviceService.GetByIds(selectedGroup.DeviceIds).Select(device => new DeviceStatus(device)).ToList();
+        }
+    }
+
+
+    private void ResetFeedback()
+    {
+        feedback = "";
+        color = "";
+    }
+}
