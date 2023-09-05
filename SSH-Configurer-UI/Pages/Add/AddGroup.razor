@@ -26,7 +26,7 @@
         base.OnInitialized();
         group = new Group();
         keys = keyService.GetAllKeyPairs();
-        devices = deviceService.GetAllDevices().Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        devices = deviceService.GetAllDevices().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
     }
 
     private void SaveGroup()

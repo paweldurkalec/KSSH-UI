@@ -33,7 +33,7 @@
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
                 Password = device.Password
-            });
+            }).Result;
         if(response == 0)
         {
             device = new Device();

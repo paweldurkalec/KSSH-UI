@@ -15,11 +15,14 @@ namespace SSH_Configurer_UI
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<DeviceService>();
+            //builder.Services.AddSingleton<DeviceService>();
             builder.Services.AddSingleton<GroupService>();
             builder.Services.AddSingleton<ScriptService>();
             builder.Services.AddSingleton<KeyPairService>();
-            builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddHttpClient<IDeviceService, DeviceService>(client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:8000");
+            });
 
             var app = builder.Build();
 

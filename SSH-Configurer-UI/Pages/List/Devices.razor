@@ -2,7 +2,6 @@
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components;
 @using SSH_Configurer_UI.Services;
-@inject DeviceService deviceService;
 @inject NavigationManager navManager;
 
 <DeviceList Devices="devices" DeleteCurrentDevice="DeleteDevice" UpdateCurrentDevice="UpdateDevice"></DeviceList>
@@ -10,9 +9,12 @@
 @code {
     private List<Device> devices;
 
+    [Inject]
+    public IDeviceService deviceService { get; set; }
+
     protected override async Task OnInitializedAsync()
-    {   
-        devices = deviceService.GetAllDevices();
+    {
+        devices = (await deviceService.GetAllDevices()).ToList();
 
         await base.OnInitializedAsync();
     }

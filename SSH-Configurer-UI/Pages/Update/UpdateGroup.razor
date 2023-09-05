@@ -42,8 +42,8 @@ else
             stateColor = "red";
         }
         keys = keyService.GetAllKeyPairs();
-        devices = deviceService.GetAllDevices().Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
-        List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds);
+        devices = deviceService.GetAllDevices().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds).Result.ToList();
         List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();
         foreach(DeviceSelect device in devicesToPreSelect)
         {
