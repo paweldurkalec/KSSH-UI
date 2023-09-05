@@ -29,7 +29,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized(); 
-        device = deviceService.GetById(int.Parse(deviceId));
+        device = deviceService.GetById(int.Parse(deviceId)).Result;
         if(device is null)
         {
             stateMessage = "Device not found!";
@@ -49,10 +49,10 @@ else
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
                 Password = device.Password
-            });
+            }).Result;
         if (response == 0)
         {
-            device = deviceService.GetById(int.Parse(deviceId));
+            device = deviceService.GetById(int.Parse(deviceId)).Result;
             feedback = "Device updated successfully.";
             color = "green";
         }

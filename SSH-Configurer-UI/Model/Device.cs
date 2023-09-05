@@ -1,4 +1,5 @@
 ﻿using Foolproof;
+using SSH_Configurer_UI.Model.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace SSH_Configurer_UI.Model
@@ -63,6 +64,17 @@ namespace SSH_Configurer_UI.Model
             Username = username;
             KeyPairId = keyPairId;
             Password = password;
+        }
+
+        public Device(DeviceDTO deviceDTO)
+        {
+            Id = deviceDTO.id;
+            Name = deviceDTO.name;
+            Hostname = deviceDTO.hostname;
+            Port = deviceDTO.port;
+            Username = deviceDTO.username;
+            KeyPairId = deviceDTO.key_pair ?? -1;
+            Password = deviceDTO.password ?? "";
         }
     }
 }

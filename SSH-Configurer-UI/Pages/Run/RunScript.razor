@@ -72,7 +72,7 @@
 
         if (configurationProcess.ScriptId != -1 && configurationProcess.GroupId != -1){
             Group selectedGroup = groupService.GetById(configurationProcess.GroupId);
-            devicesBeingConfigured = deviceService.GetByIds(selectedGroup.DeviceIds).Select(device => new DeviceStatus(device)).ToList();
+            devicesBeingConfigured = deviceService.GetByIds(selectedGroup.DeviceIds).Result.Select(device => new DeviceStatus(device)).ToList();
         }
     }
 
