@@ -1,5 +1,5 @@
 ﻿using Foolproof;
-using SSH_Configurer_UI.Model.DTOs;
+using SSH_Configurer_UI.Model.DTOs.Device;
 using System.ComponentModel.DataAnnotations;
 
 namespace SSH_Configurer_UI.Model
