@@ -1,11 +1,7 @@
 ﻿@page "/add-script"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components
-@using SSH_Configurer_UI.Services
-@inject ScriptService scriptService
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components.Forms
+@inject IContentService<Script> scriptService
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 <AddEditScript script="@script" resetFeedback="@ResetFeedback" saveScript="@SaveScript" color="@color" feedback="@feedback"></AddEditScript>
 
 @code {
@@ -21,11 +17,11 @@
 
     private void SaveScript()
     {
-        int response = scriptService.AddScript(new Script
+        int response = scriptService.Add(new Script
             {
                 Name = script.Name,
                 Content = script.Content
-            });
+            }).Result;
         if (response == 0)
         {
             script = new Script();
@@ -43,5 +39,10 @@
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Add new script";
     }
 }

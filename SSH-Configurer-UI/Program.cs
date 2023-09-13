@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SSH_Configurer_UI.Model;
 using SSH_Configurer_UI.Services;
+using SSH_Configurer_UI.Services.Interfaces;
 using Syncfusion.Blazor;
 
 namespace SSH_Configurer_UI
@@ -15,24 +16,38 @@ namespace SSH_Configurer_UI
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<IDeviceService, DeviceService>(provider =>
+            builder.Services.AddSingleton<IContentService<Device>, DeviceService>(provider =>
             {
                 var httpClient = new HttpClient
                 {
                     BaseAddress = new Uri("http://127.0.0.1:8000/api/devices/")
                 };
-
-                // You can also configure other HttpClient settings here if needed.
-
                 return new DeviceService(httpClient);
             });
-            builder.Services.AddSingleton<GroupService>();
-            builder.Services.AddSingleton<ScriptService>();
-            builder.Services.AddSingleton<KeyPairService>();
-            //builder.Services.AddHttpClient<IDeviceService, DeviceService>(client =>
-            //{
-            //    client.BaseAddress = new Uri("http://127.0.0.1:8000/api/devices/");
-            //});
+            builder.Services.AddSingleton<IContentService<Group>, GroupService>(provider =>
+            {
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri("http://127.0.0.1:8000/api/groups/")
+                };
+                return new GroupService(httpClient);
+            });
+            builder.Services.AddSingleton<IContentService<Script>, ScriptService>(provider =>
+            {
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri("http://127.0.0.1:8000/api/scripts/")
+                };
+                return new ScriptService(httpClient);
+            });
+            builder.Services.AddSingleton<IContentService<KeyPair>, KeyPairService>(provider =>
+            {
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri("http://127.0.0.1:8000/api/keys/")
+                };
+                return new KeyPairService(httpClient);
+            });
 
             var app = builder.Build();
 

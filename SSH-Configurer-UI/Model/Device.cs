@@ -66,7 +66,7 @@ namespace SSH_Configurer_UI.Model
             Password = password;
         }
 
-        public Device(DeviceDTO deviceDTO)
+        public Device(DeviceDTOId deviceDTO)
         {
             Id = deviceDTO.id;
             Name = deviceDTO.name;

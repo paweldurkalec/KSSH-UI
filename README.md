@@ -3,10 +3,10 @@ Front-end for application for configuration of groups of devices via SSH protoco
 
 ## TODO:
 
-crud kluczy, 
-widok wykonania skryptu,
+rozróżnienie widoków add/update,
+walidacja,
+lepszy widok kluczy i skryptów,
 popup z potwierdzeniem usunięcia,
-podłączenie do bekendu,
 uwierzytelnienie,
 web sokiety, 
 cssy, 

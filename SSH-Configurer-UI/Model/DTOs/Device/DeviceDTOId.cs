@@ -1,7 +1,13 @@
-﻿namespace SSH_Configurer_UI.Model.DTOs.Device
+﻿using Foolproof;
+using System.ComponentModel.DataAnnotations;
+using SSH_Configurer_UI.Model;
+
+namespace SSH_Configurer_UI.Model.DTOs.Device
 {
-    public class DeviceDTOPost
+    public class DeviceDTOId
     {
+        public int id { get; set; }
+
         public string name { get; set; }
 
         public string hostname { get; set; }
@@ -13,10 +19,11 @@
         public int? key_pair { get; set; }
 
         public string? password { get; set; }
-        public DeviceDTOPost() { }
+        public DeviceDTOId() { }
 
-        public DeviceDTOPost(Model.Device device)
+        public DeviceDTOId(Model.Device device)
         {
+            id = device.Id;
             name = device.Name;
             hostname = device.Hostname;
             port = device.Port;
@@ -26,4 +33,3 @@
         }
     }
 }
-

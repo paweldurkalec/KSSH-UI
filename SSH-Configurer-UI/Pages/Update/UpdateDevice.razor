@@ -1,9 +1,9 @@
 ﻿@page "/update-device/{deviceId}"
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
-@using SSH_Configurer_UI.Services
-@inject IDeviceService deviceService
-@inject KeyPairService keyService
+@using SSH_Configurer_UI.Services.Interfaces
+@inject IContentService<Device> deviceService
+@inject IContentService<KeyPair> keyPairService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -13,6 +13,7 @@
 }
 else
 {
+    <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
     <AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
 }
 
@@ -35,12 +36,12 @@ else
             stateMessage = "Device not found!";
             stateColor = "red";
         }
-        keys = keyService.GetAllKeyPairs();
+        keys = keyPairService.GetAll().Result.ToList();
     }
 
     private void SaveDevice()
     {
-        int response = deviceService.UpdateDevice(int.Parse(deviceId), new Device
+        int response = deviceService.Update(int.Parse(deviceId), new Device
             {
                 Id = device.Id,
                 Name = device.Name,
@@ -67,5 +68,10 @@ else
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Updating device with id {device.Id}";
     }
 }

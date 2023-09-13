@@ -1,56 +1,140 @@
 ﻿using SSH_Configurer_UI.Model;
+using SSH_Configurer_UI.Model.DTOs.Script;
 using SSH_Configurer_UI.Pages.List;
+using SSH_Configurer_UI.Services.Interfaces;
+using System.Text.Json;
 
 namespace SSH_Configurer_UI.Services
 {
-    public class ScriptService
+    public class ScriptService : IContentService<Script>
     {
-        private List<Script> Scripts = new()
-{
-            new Script(0, "hello_world_python","#!/bin/bash\nif ! command -v python3 &> /dev/null; then\n    sudo apt-get update\n    sudo apt-get install -y python3\nfi\npython3 -m venv venv\nsource venv/bin/activate\n\n# Install any required packages within the virtual environment\n# Example: pip install requests\n\necho \"print('Hello, World!')\" > hello.py\npython hello.py\ndeactivate\nrm hello.py\n"),
-            new Script(1, "hello_world_dotnet", "#!/bin/bash\nif ! command -v dotnet &> /dev/null; then\n    wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb\\n    sudo dpkg -i packages-microsoft-prod.deb\\n    sudo apt-get update\\n    sudo apt-get install -y dotnet-sdk-5.0\\nfi\\n\\nmkdir HelloWorldApp\\n\\n# Create a new console application\\ndotnet new console -n HelloWorldApp\\n\\ncd HelloWorldApp\\n\\ndotnet run\\n\\ncd ..\\n\\nrm -rf HelloWorldApp\\n\r\n")
-        };
+        private readonly HttpClient httpClient;
 
-        public List<Script> GetAllScripts()
+        public ScriptService(HttpClient httpClient)
         {
-            return new List<Script>(Scripts);
+            this.httpClient = httpClient;
         }
 
-        public Script? GetById(int id)
+        public async Task<int> Add(Script script)
         {
-            return Scripts.FirstOrDefault(script => script.Id == id, null);
-        }
-
-        public List<Script> GetByIds(IEnumerable<int> ids) => ids.Select(GetById).Where(script => script is not null).ToList();
-
-        public List<Script> SearchByName(string input)
-        {
-            List<Script> filtered = Scripts.Where(script => script.Name.ToLower().Contains(input.ToLower())).ToList();
-
-            return filtered;
-        }
-
-        public int AddScript(Script script)
-        {
-            Scripts.Add(script);
-            return 0;
-        }
-
-        public int UpdateScript(int id, Script script)
-        {
-            int index = Scripts.IndexOf(Scripts.FirstOrDefault(script => script.Id == id));
-            if (index != -1)
+            try
             {
-                Scripts[index] = script;
+                string serialized = JsonSerializer.Serialize(new ScriptDTO(script));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PostAsync("", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
                 return 0;
             }
-            return -1;
         }
 
-        public int RemoveScript(Script script)
+        public async Task<int> Update(int id, Script script)
         {
-            Scripts.Remove(script);
-            return 0;
+            try
+            {
+                string serialized = JsonSerializer.Serialize(new ScriptDTO(script));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<IEnumerable<Script>> GetAll()
+        {
+            try
+            {
+                var dtos = await httpClient.GetFromJsonAsync<IEnumerable<ScriptDTOId>>("").ConfigureAwait(false);
+
+                return dtos.Select(d => new Script(d)).OrderBy(d => d.Id).ToList();
+            }
+            catch (HttpRequestException)
+            {
+                return new List<Script>();
+            }
+        }
+
+
+        public async Task<Script?> GetById(int id)
+        {
+            try
+            {
+                var dto = await httpClient.GetFromJsonAsync<ScriptDTOId>($"{id}/").ConfigureAwait(false);
+
+                if (dto != null)
+                {
+                    return new Script(dto);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<Script>> GetByIds(IEnumerable<int> ids)
+        {
+            var tasks = ids.Select(id => GetById(id));
+            var scripts = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            return scripts.Where(script => script is not null).Select(script => script!);
+        }
+
+        public async Task<IEnumerable<Script>> SearchByName(string input)
+        {
+            var allScripts = await GetAll().ConfigureAwait(false);
+
+            var filteredScripts = allScripts.Where(script => script.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+
+            return filteredScripts.ToList();
+        }
+
+        public async Task<int> Remove(Script script)
+        {
+            try
+            {
+                var response = await httpClient.DeleteAsync($"{script.Id}").ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 1;
+            }
         }
     }
 }

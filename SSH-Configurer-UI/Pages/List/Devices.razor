@@ -1,30 +1,37 @@
 ﻿@page "/devices"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components;
-@using SSH_Configurer_UI.Services;
 @inject NavigationManager navManager;
-@inject IDeviceService deviceService;
+@inject IContentService<Device> deviceService;
 
-<DeviceList Devices="devices" DeleteCurrentDevice="DeleteDevice" UpdateCurrentDevice="UpdateDevice"></DeviceList>
+<DeviceList Devices="devices" DeleteCurrentDevice="RequestDeletion" UpdateCurrentDevice="UpdateDevice"></DeviceList>
+
+<Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteDevice"></Confirmation>
 
 @code {
     private List<Device> devices;
-
-    // [Inject]
-    // public IDeviceService deviceService { get; set; }
+    private Confirmation deleteConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
-        devices = (await deviceService.GetAllDevices()).ToList();
+        devices = (await deviceService.GetAll()).ToList();
 
         await base.OnInitializedAsync();
     }
 
-    private void DeleteDevice(Device device)
+    private async Task RequestDeletion(Device device)
     {
-        int result = deviceService.RemoveDevice(device).Result;
+        deleteConfirmation.HeaderContent = $"Deleting device";
+        deleteConfirmation.BodyContent = $"Are you sure you want to delete device named {device.Name} with id {device.Id}?\n" +
+                                          "This action can not be undone.";
+        deleteConfirmation.actionItem = device;
+        deleteConfirmation.Show();
+    }
+
+    private async Task DeleteDevice(Object o)
+    {
+        Device device = (Device)o;
+        int result = deviceService.Remove(device).Result;
         if(result==0){
-            devices = (deviceService.GetAllDevices()).Result.ToList();
+            devices = (deviceService.GetAll()).Result.ToList();
         }    
     }
 

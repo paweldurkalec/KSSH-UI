@@ -1,5 +1,6 @@
 ﻿@using SSH_Configurer_UI.Model;
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 @if (Scripts is null)
 {
     <br />
@@ -55,4 +56,9 @@ else
 
     [Parameter]
     public EventCallback<int> UpdateCurrentScript { get; set; }
+
+    private string getTopInfo()
+    {
+        return $"List of all scripts";
+    }
 }

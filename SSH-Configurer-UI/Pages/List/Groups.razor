@@ -1,25 +1,40 @@
 ﻿@page "/groups"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components;
-@using SSH_Configurer_UI.Services;
-@inject GroupService groupService;
+@inject IContentService<Group> groupService
 @inject NavigationManager navManager;
 
-<GroupList Groups="groups" DeleteCurrentGroup="DeleteGroup" UpdateCurrentGroup="UpdateGroup"></GroupList>
+<GroupList Groups="groups" DeleteCurrentGroup="RequestDeletion" UpdateCurrentGroup="UpdateGroup"></GroupList>
+
+<Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteGroup"></Confirmation>
 
 @code {
     private List<Group> groups;
+    private Confirmation deleteConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
-        groups = groupService.GetAllGroups();
+        groups = groupService.GetAll().Result.ToList();
 
         await base.OnInitializedAsync();
     }
 
-    private void DeleteGroup(Group device)
+    private async Task RequestDeletion(Group group)
     {
-        groupService.RemoveGroup(device);
+        deleteConfirmation.HeaderContent = $"Deleting group";
+        deleteConfirmation.BodyContent = $"Are you sure you want to delete group named {group.Name} with id {group.Id}?\n" +
+                                          "Devices connected to this group will not be deleted.\n" +
+                                          "This action can not be undone.";
+        deleteConfirmation.actionItem = group;
+        deleteConfirmation.Show();
+    }
+
+    private void DeleteGroup(Object o)
+    {
+        Group group = (Group)o;
+        int result = groupService.Remove(group).Result;
+        if (result == 0)
+        {
+            groups = (groupService.GetAll()).Result.ToList();
+        }
     }
 
     private void UpdateGroup(int id)

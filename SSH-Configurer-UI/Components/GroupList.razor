@@ -1,5 +1,6 @@
 ﻿@using SSH_Configurer_UI.Model;
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 @if (Groups is null)
 {
     <br />
@@ -67,4 +68,8 @@ else
         return Groups.Count;
     }
 
+    private string getTopInfo()
+    {
+        return $"List of all groups";
+    }
 }
