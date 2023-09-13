@@ -1,12 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SSH_Configurer_UI.Model.DTOs.Script;
+using System.ComponentModel.DataAnnotations;
 
 namespace SSH_Configurer_UI.Model
 {
     public class Script
     {
         public int Id { get; set; }
+
         [Required]
         public string Name { get; set; }
+
         [Required]
         public string Content { get; set; }
 
@@ -18,5 +21,12 @@ namespace SSH_Configurer_UI.Model
         }
 
         public Script() { }
+
+        public Script(ScriptDTOId scriptDTO)
+        {
+            Id = scriptDTO.id;
+            Name = scriptDTO.name;
+            Content = scriptDTO.script;
+        }
     }
 }

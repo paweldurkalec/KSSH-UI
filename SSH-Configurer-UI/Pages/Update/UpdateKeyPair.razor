@@ -2,8 +2,7 @@
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
-@inject KeyPairService keyPairService
-@inject KeyPairService keyService
+@inject IContentService<KeyPair> keyPairService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -13,6 +12,7 @@
 }
 else
 {
+    <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
     <AddEditKeyPair keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></AddEditKeyPair>
 }
 
@@ -28,7 +28,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        keyPair = keyPairService.GetById(int.Parse(keyPairId));
+        keyPair = keyPairService.GetById(int.Parse(keyPairId)).Result;
         if (keyPair is null)
         {
             stateMessage = "KeyPair not found!";
@@ -38,16 +38,16 @@ else
 
     private void SaveKeyPair()
     {
-        int response = keyPairService.UpdateKeyPair(int.Parse(keyPairId), new KeyPair
+        int response = keyPairService.Update(int.Parse(keyPairId), new KeyPair
             {
                 Id = keyPair.Id,
                 Name = keyPair.Name,
                 PublicKey = keyPair.PublicKey,
                 PrivateKey = keyPair.PrivateKey
-            });
+            }).Result;
         if (response == 0)
         {
-            keyPair = keyPairService.GetById(int.Parse(keyPairId));
+            keyPair = keyPairService.GetById(int.Parse(keyPairId)).Result;
             feedback = "KeyPair updated successfully.";
             color = "green";
         }
@@ -62,5 +62,10 @@ else
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Updating pair of asymmetric keys with id {keyPair.Id}";
     }
 }

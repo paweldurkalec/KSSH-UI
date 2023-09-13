@@ -1,57 +1,142 @@
 ﻿using SSH_Configurer_UI.Model;
+using SSH_Configurer_UI.Model.DTOs.Group;
 using SSH_Configurer_UI.Pages;
 using SSH_Configurer_UI.Pages.List;
 using static System.Net.Mime.MediaTypeNames;
+using System.Text.Json;
+using SSH_Configurer_UI.Services.Interfaces;
 
 namespace SSH_Configurer_UI.Services
 {
-    public class GroupService
+    public class GroupService : IContentService<Group>
     {
-        private List<Group> Groups = new()
-        {
-            new Group(0, "Room1", 0, new List<int>(){0,1,2}),
-            new Group(1, "Room1", 1, new List<int>(){3,4})
+        private readonly HttpClient httpClient;
 
-        };
-
-        public List<Group> GetAllGroups()
+        public GroupService(HttpClient httpClient)
         {
-            return Groups;
+            this.httpClient = httpClient;
         }
 
-        public Group? GetById(int id)
+        public async Task<int> Add(Group group)
         {
-            return Groups.FirstOrDefault(group => group.Id == id, null);
-        }
-
-        public List<Group> SearchByName(string input)
-        {
-            List<Group> filtered = Groups.Where(group => group.Name.ToLower().Contains(input.ToLower())).ToList();
-
-            return filtered;
-        }
-
-        public int UpdateGroup(int id, Group group)
-        {
-            int index = Groups.IndexOf(Groups.FirstOrDefault(group => group.Id == id));
-            if (index != -1)
+            try
             {
-                Groups[index] = group;
+                string serialized = JsonSerializer.Serialize(new GroupDTO(group));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PostAsync("", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
                 return 0;
             }
-            return -1;
         }
 
-        public int AddGroup(Group group)
+        public async Task<int> Update(int id, Group group)
         {
-            Groups.Add(group);
-            return 0;
+            try
+            {
+                string serialized = JsonSerializer.Serialize(new GroupDTO(group));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 0;
+            }
         }
 
-        public int RemoveGroup(Group group)
+        public async Task<IEnumerable<Group>> GetAll()
         {
-            Groups.Remove(group);
-            return 0;
+            try
+            {
+                var dtos = await httpClient.GetFromJsonAsync<IEnumerable<GroupDTOId>>("").ConfigureAwait(false);
+
+                return dtos.Select(d => new Group(d)).OrderBy(d => d.Id).ToList();
+            }
+            catch (HttpRequestException)
+            {
+                return new List<Group>();
+            }
+        }
+
+
+        public async Task<Group?> GetById(int id)
+        {
+            try
+            {
+                var dto = await httpClient.GetFromJsonAsync<GroupDTOId>($"{id}/").ConfigureAwait(false);
+
+                if (dto != null)
+                {
+                    return new Group(dto);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<Group>> GetByIds(IEnumerable<int> ids)
+        {
+            var tasks = ids.Select(id => GetById(id));
+            var groups = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            return groups.Where(group => group is not null).Select(group => group!);
+        }
+
+        public async Task<IEnumerable<Group>> SearchByName(string input)
+        {
+            var allGroups = await GetAll().ConfigureAwait(false);
+
+            var filteredGroups = allGroups.Where(group => group.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+
+            return filteredGroups.ToList();
+        }
+
+        public async Task<int> Remove(Group group)
+        {
+            try
+            {
+                var response = await httpClient.DeleteAsync($"{group.Id}").ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 1;
+            }
         }
     }
 }

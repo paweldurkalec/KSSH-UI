@@ -2,8 +2,8 @@
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
-@inject ScriptService scriptService
-@inject KeyPairService keyService
+@inject IContentService<Script> scriptService
+@inject IContentService<KeyPair> keyPairService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -13,6 +13,7 @@
 }
 else
 {
+    <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
     <AddEditScript script="@script" resetFeedback="@ResetFeedback" saveScript="@SaveScript" color="@color" feedback="@feedback"></AddEditScript>
 }
 
@@ -28,7 +29,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        script = scriptService.GetById(int.Parse(scriptId));
+        script = scriptService.GetById(int.Parse(scriptId)).Result;
         if (script is null)
         {
             stateMessage = "Script not found!";
@@ -38,15 +39,15 @@ else
 
     private void SaveScript()
     {
-        int response = scriptService.UpdateScript(int.Parse(scriptId), new Script
+        int response = scriptService.Update(int.Parse(scriptId), new Script
             {
                 Id = script.Id,
                 Name = script.Name,
                 Content = script.Content,
-            });
+            }).Result;
         if (response == 0)
         {
-            script = scriptService.GetById(int.Parse(scriptId));
+            script = scriptService.GetById(int.Parse(scriptId)).Result;
             feedback = "Script updated successfully.";
             color = "green";
         }
@@ -61,5 +62,10 @@ else
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Updating script with id {script.Id}";
     }
 }

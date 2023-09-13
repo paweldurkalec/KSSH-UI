@@ -1,14 +1,9 @@
 ﻿@page "/add-group"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components
-@using SSH_Configurer_UI.Services
-@using Syncfusion.Blazor.Grids
-@inject GroupService groupService
-@inject KeyPairService keyService
-@inject DeviceService deviceService
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components.Forms
+@inject IContentService<Group> groupService
+@inject IContentService<KeyPair> keyService
+@inject IContentService<Device> deviceService
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 <AddEditGroup @bind-searchText="@searchText" @bind-searchText:event="ValueChanged" group="@group" searchedDevices="@searchedDevices" resetFeedback="@ResetFeedback" saveDevice="@SaveGroup" keys="@keys" color="@color" feedback="@feedback"></AddEditGroup>
 
 @code {
@@ -25,20 +20,20 @@
     {
         base.OnInitialized();
         group = new Group();
-        keys = keyService.GetAllKeyPairs();
-        devices = deviceService.GetAllDevices().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        keys = keyService.GetAll().Result.ToList();
+        devices = deviceService.GetAll().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
     }
 
     private void SaveGroup()
     {
         List<int> deviceIds = devices.Where(device => device.IsSelected == true).Select(device => device.Id).ToList();
 
-        int response = groupService.AddGroup(new Group
+        int response = groupService.Add(new Group
             {
                 Name = group.Name,
                 KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
-            });
+            }).Result;
 
         if (response == 0)
         {
@@ -58,5 +53,10 @@
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Add new group";
     }
 }

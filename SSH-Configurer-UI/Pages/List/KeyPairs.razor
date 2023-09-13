@@ -1,26 +1,39 @@
 ﻿@page "/keyPairs"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components;
-@using SSH_Configurer_UI.Services;
-@inject KeyPairService keyPairService;
+@inject IContentService<KeyPair> keyPairService
 @inject NavigationManager navManager;
 
-<KeyPairList KeyPairs="keyPairs" DeleteCurrentKeyPair="DeleteKeyPair" UpdateCurrentKeyPair="UpdateKeyPair"></KeyPairList>
+<KeyPairList KeyPairs="keyPairs" DeleteCurrentKeyPair="RequestDeletion" UpdateCurrentKeyPair="UpdateKeyPair"></KeyPairList>
+
+<Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteKeyPair"></Confirmation>
 
 @code {
     private List<KeyPair> keyPairs;
+    private Confirmation deleteConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
-        keyPairs = keyPairService.GetAllKeyPairs();
+        keyPairs = keyPairService.GetAll().Result.ToList();
 
         await base.OnInitializedAsync();
     }
 
-    private void DeleteKeyPair(KeyPair keyPair)
+    private async Task RequestDeletion(KeyPair keyPair)
     {
-        keyPairService.RemoveKeyPair(keyPair);
-        keyPairs = keyPairService.GetAllKeyPairs();
+        deleteConfirmation.HeaderContent = $"Deleting pair of keys";
+        deleteConfirmation.BodyContent = $"Are you sure you want to delete pair of keys named {keyPair.Name} with id {keyPair.Id}?\n" +
+                                          "This action can not be undone.";
+        deleteConfirmation.actionItem = keyPair;
+        deleteConfirmation.Show();
+    }
+
+    private void DeleteKeyPair(Object o)
+    {
+        KeyPair keyPair = (KeyPair)o;
+        int result = keyPairService.Remove(keyPair).Result;
+        if (result == 0)
+        {
+            keyPairs = keyPairService.GetAll().Result.ToList();
+        }
     }
 
     private void UpdateKeyPair(int id)

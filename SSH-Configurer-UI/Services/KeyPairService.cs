@@ -1,54 +1,140 @@
 ﻿using SSH_Configurer_UI.Model;
+using SSH_Configurer_UI.Model.DTOs.KeyPair;
 using SSH_Configurer_UI.Pages.List;
+using SSH_Configurer_UI.Services.Interfaces;
+using System.Text.Json;
 
 namespace SSH_Configurer_UI.Services
 {
-    public class KeyPairService
+    public class KeyPairService : IContentService<KeyPair>
     {
-        private static readonly List<KeyPair> Keys = new()
-        {
-        };
+        private readonly HttpClient httpClient;
 
-        public List<KeyPair> GetAllKeyPairs()
+        public KeyPairService(HttpClient httpClient)
         {
-            return Keys;
+            this.httpClient = httpClient;
         }
 
-        public KeyPair? GetById(int id)
+        public async Task<int> Add(KeyPair keyPair)
         {
-            return Keys.FirstOrDefault(keyPair => keyPair.Id == id, null);
-        }
-
-        public List<KeyPair> GetByIds(IEnumerable<int> ids) => ids.Select(GetById).Where(keyPair => keyPair is not null).ToList();
-
-        public List<KeyPair> SearchByName(string input)
-        {
-            List<KeyPair> filtered = Keys.Where(keyPair => keyPair.Name.ToLower().Contains(input.ToLower())).ToList();
-
-            return filtered;
-        }
-
-        public int AddKeyPair(KeyPair keyPair)
-        {
-            Keys.Add(keyPair);
-            return 0;
-        }
-
-        public int UpdateKeyPair(int id, KeyPair keyPair)
-        {
-            int index = Keys.IndexOf(Keys.FirstOrDefault(keyPair => keyPair.Id == id));
-            if (index != -1)
+            try
             {
-                Keys[index] = keyPair;
+                string serialized = JsonSerializer.Serialize(new KeyPairDTO(keyPair));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PostAsync("", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
                 return 0;
             }
-            return -1;
         }
 
-        public int RemoveKeyPair(KeyPair keyPair)
+        public async Task<int> Update(int id, KeyPair keyPair)
         {
-            Keys.Remove(keyPair);
-            return 0;
+            try
+            {
+                string serialized = JsonSerializer.Serialize(new KeyPairDTO(keyPair));
+                var bytes = MyUtils.ConvertToBytes(serialized);
+
+                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<IEnumerable<KeyPair>> GetAll()
+        {
+            try
+            {
+                var dtos = await httpClient.GetFromJsonAsync<IEnumerable<KeyPairDTOId>>("").ConfigureAwait(false);
+
+                return dtos.Select(d => new KeyPair(d)).OrderBy(d => d.Id).ToList();
+            }
+            catch (HttpRequestException)
+            {
+                return new List<KeyPair>();
+            }
+        }
+
+
+        public async Task<KeyPair?> GetById(int id)
+        {
+            try
+            {
+                var dto = await httpClient.GetFromJsonAsync<KeyPairDTOId>($"{id}/").ConfigureAwait(false);
+
+                if (dto != null)
+                {
+                    return new KeyPair(dto);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<KeyPair>> GetByIds(IEnumerable<int> ids)
+        {
+            var tasks = ids.Select(id => GetById(id));
+            var keyPairs = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            return keyPairs.Where(keyPair => keyPair is not null).Select(keyPair => keyPair!);
+        }
+
+        public async Task<IEnumerable<KeyPair>> SearchByName(string input)
+        {
+            var allKeyPairs = await GetAll().ConfigureAwait(false);
+
+            var filteredKeyPairs = allKeyPairs.Where(keyPair => keyPair.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+
+            return filteredKeyPairs.ToList();
+        }
+
+        public async Task<int> Remove(KeyPair keyPair)
+        {
+            try
+            {
+                var response = await httpClient.DeleteAsync($"{keyPair.Id}").ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 1;
+            }
         }
     }
 }

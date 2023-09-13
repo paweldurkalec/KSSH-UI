@@ -1,13 +1,14 @@
 ﻿using SSH_Configurer_UI.Model;
 using SSH_Configurer_UI.Model.DTOs.Device;
 using SSH_Configurer_UI.Pages.List;
+using SSH_Configurer_UI.Services.Interfaces;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
 namespace SSH_Configurer_UI.Services
 {
-    public class DeviceService : IDeviceService
+    public class DeviceService : IContentService<Device>
     {
         private readonly HttpClient httpClient;
 
@@ -16,45 +17,66 @@ namespace SSH_Configurer_UI.Services
             this.httpClient = httpClient;
         }
 
-        public async Task<int> AddDevice(Device device)
+        public async Task<int> Add(Device device)
         {
-            string serialized = JsonSerializer.Serialize(new DeviceDTOPost(device));
-            var bytes = MyUtils.ConvertToBytes(serialized);
+            try
+            {
+                string serialized = JsonSerializer.Serialize(new DeviceDTO(device));
+                var bytes = MyUtils.ConvertToBytes(serialized);
 
-            var response = await httpClient.PostAsync("", bytes).ConfigureAwait(false);
+                var response = await httpClient.PostAsync("", bytes).ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
             {
                 return 0;
             }
-            else
-            {
-                return 1;
-            }
         }
 
-        public async Task<int> UpdateDevice(int id, Device device)
+        public async Task<int> Update(int id, Device device)
         {
-            string serialized = JsonSerializer.Serialize(new DeviceDTOPost(device));
-            var bytes = MyUtils.ConvertToBytes(serialized);
+            try
+            {
+                string serialized = JsonSerializer.Serialize(new DeviceDTO(device));
+                var bytes = MyUtils.ConvertToBytes(serialized);
 
-            var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            catch (HttpRequestException)
             {
                 return 0;
             }
-            else
-            {
-                return 1;
-            }
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevices()
+        public async Task<IEnumerable<Device>> GetAll()
         {
-            var dtos = await httpClient.GetFromJsonAsync<IEnumerable<DeviceDTO>>("").ConfigureAwait(false);
+            try
+            {
+                var dtos = await httpClient.GetFromJsonAsync<IEnumerable<DeviceDTOId>>("").ConfigureAwait(false);
 
-            return dtos.Select(d => new Device(d)).OrderBy(d => d.Id).ToList();
+                return dtos.Select(d => new Device(d)).OrderBy(d => d.Id).ToList();
+            }
+            catch (HttpRequestException)
+            {
+                return new List<Device>();
+            }
         }
     
 
@@ -62,7 +84,7 @@ namespace SSH_Configurer_UI.Services
         {
             try
             {
-                var dto = await httpClient.GetFromJsonAsync<DeviceDTO>($"{id}/").ConfigureAwait(false);
+                var dto = await httpClient.GetFromJsonAsync<DeviceDTOId>($"{id}/").ConfigureAwait(false);
 
                 if (dto != null)
                 {
@@ -89,14 +111,14 @@ namespace SSH_Configurer_UI.Services
 
         public async Task<IEnumerable<Device>> SearchByName(string input)
         {
-            var allDevices = await GetAllDevices().ConfigureAwait(false);
+            var allDevices = await GetAll().ConfigureAwait(false);
 
             var filteredDevices = allDevices.Where(device => device.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
 
             return filteredDevices.ToList();
         }
 
-        public async Task<int> RemoveDevice(Device device)
+        public async Task<int> Remove(Device device)
         {
             try
             {

@@ -2,9 +2,9 @@
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
-@inject GroupService groupService
-@inject DeviceService deviceService
-@inject ScriptService scriptService
+@inject IContentService<Group> groupService
+@inject IContentService<Device> deviceService
+@inject IContentService<Script> scriptService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -63,15 +63,15 @@
         base.OnInitialized();
         configurationProcess = new(-1,-1, "new");
         devicesBeingConfigured = new();
-        allGroups = groupService.GetAllGroups();
-        allScripts = scriptService.GetAllScripts();
+        allGroups = groupService.GetAll().Result.ToList();
+        allScripts = scriptService.GetAll().Result.ToList();
     }
 
     private void Run()
     {
 
         if (configurationProcess.ScriptId != -1 && configurationProcess.GroupId != -1){
-            Group selectedGroup = groupService.GetById(configurationProcess.GroupId);
+            Group selectedGroup = groupService.GetById(configurationProcess.GroupId).Result;
             devicesBeingConfigured = deviceService.GetByIds(selectedGroup.DeviceIds).Result.Select(device => new DeviceStatus(device)).ToList();
         }
     }

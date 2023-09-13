@@ -1,26 +1,39 @@
 ﻿@page "/scripts"
-@using SSH_Configurer_UI.Model;
-@using SSH_Configurer_UI.Components;
-@using SSH_Configurer_UI.Services;
-@inject ScriptService scriptService;
+@inject IContentService<Script> scriptService
 @inject NavigationManager navManager;
 
-<ScriptList Scripts="scripts" DeleteCurrentScript="DeleteScript" UpdateCurrentScript="UpdateScript"></ScriptList>
+<ScriptList Scripts="scripts" DeleteCurrentScript="RequestDeletion" UpdateCurrentScript="UpdateScript"></ScriptList>
+
+<Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteScript"></Confirmation>
 
 @code {
     private List<Script> scripts;
+    private Confirmation deleteConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
-        scripts = scriptService.GetAllScripts();
+        scripts = scriptService.GetAll().Result.ToList();
 
         await base.OnInitializedAsync();
     }
 
-    private void DeleteScript(Script script)
+    private async Task RequestDeletion(Script script)
     {
-        scriptService.RemoveScript(script);
-        scripts = scriptService.GetAllScripts();
+        deleteConfirmation.HeaderContent = $"Deleting script";
+        deleteConfirmation.BodyContent = $"Are you sure you want to delete script named {script.Name} with id {script.Id}?\n" +
+                                          "This action can not be undone.";
+        deleteConfirmation.actionItem = script;
+        deleteConfirmation.Show();
+    }
+
+    private void DeleteScript(Object o)
+    {
+        Script script = (Script)o;
+        int result = scriptService.Remove(script).Result;
+        if (result == 0)
+        {
+            scripts = scriptService.GetAll().Result.ToList();
+        }
     }
 
     private void UpdateScript(int id)

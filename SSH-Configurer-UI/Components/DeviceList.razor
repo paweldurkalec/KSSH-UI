@@ -1,5 +1,6 @@
 ﻿@using SSH_Configurer_UI.Model;
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 @if(Devices is null)
 {
     <br />
@@ -62,4 +63,9 @@ else{
 
     [Parameter]
     public EventCallback<int> UpdateCurrentDevice { get; set; }
+
+    private string getTopInfo()
+    {
+        return $"List of all devices";
+    }
 }

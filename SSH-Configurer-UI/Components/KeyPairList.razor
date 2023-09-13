@@ -1,5 +1,6 @@
 ﻿@using SSH_Configurer_UI.Model;
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 @if (KeyPairs is null)
 {
     <br />
@@ -53,4 +54,9 @@ else
 
     [Parameter]
     public EventCallback<int> UpdateCurrentKeyPair { get; set; }
+
+    private string getTopInfo()
+    {
+        return $"List of pairs of assymetric keys";
+    }
 }

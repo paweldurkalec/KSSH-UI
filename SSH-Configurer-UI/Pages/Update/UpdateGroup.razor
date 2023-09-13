@@ -3,9 +3,9 @@
 @using SSH_Configurer_UI.Components
 @using SSH_Configurer_UI.Services
 @using Syncfusion.Blazor.Grids
-@inject GroupService groupService
-@inject KeyPairService keyService
-@inject DeviceService deviceService
+@inject IContentService<Group> groupService
+@inject IContentService<KeyPair> keyPairService
+@inject IContentService<Device> deviceService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -15,7 +15,8 @@
 }
 else
 {
-<AddEditGroup @bind-searchText="@searchText" @bind-searchText:event="ValueChanged" group="@group" searchedDevices="@searchedDevices" resetFeedback="@ResetFeedback" saveDevice="@UpdateCurrentGroup" keys="@keys" color="@color" feedback="@feedback"></AddEditGroup>
+    <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
+    <AddEditGroup @bind-searchText="@searchText" @bind-searchText:event="ValueChanged" group="@group" searchedDevices="@searchedDevices" resetFeedback="@ResetFeedback" saveDevice="@UpdateCurrentGroup" keys="@keys" color="@color" feedback="@feedback"></AddEditGroup>
 }
 
 @code {
@@ -35,14 +36,14 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        group = groupService.GetById(int.Parse(groupId));
+        group = groupService.GetById(int.Parse(groupId)).Result;
         if (group is null)
         {
             stateMessage = "Group not found!";
             stateColor = "red";
         }
-        keys = keyService.GetAllKeyPairs();
-        devices = deviceService.GetAllDevices().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        keys = keyPairService.GetAll().Result.ToList();
+        devices = deviceService.GetAll().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
         List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds).Result.ToList();
         List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();
         foreach(DeviceSelect device in devicesToPreSelect)
@@ -55,17 +56,17 @@ else
     {
         List<int> deviceIds = devices.Where(device => device.IsSelected == true).Select(device => device.Id).ToList();
 
-        int response = groupService.UpdateGroup(int.Parse(groupId), new Group
+        int response = groupService.Update(int.Parse(groupId), new Group
             {
                 Id = group.Id,
                 Name = group.Name,
                 KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
-            });
+            }).Result;
 
         if (response == 0)
         {
-            group = groupService.GetById(int.Parse(groupId));
+            group = groupService.GetById(int.Parse(groupId)).Result;
             devices.ForEach(device => device.IsSelected = false);
             feedback = "Group added successfully.";
             color = "green";
@@ -81,5 +82,10 @@ else
     {
         feedback = "";
         color = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Updating group with id {group.Id}";
     }
 }
