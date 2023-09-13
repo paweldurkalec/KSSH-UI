@@ -2,13 +2,16 @@
 @inject IContentService<Script> scriptService
 @inject NavigationManager navManager;
 
-<ScriptList Scripts="scripts" DeleteCurrentScript="RequestDeletion" UpdateCurrentScript="UpdateScript"></ScriptList>
+<ScriptList Scripts="scripts" ShowScriptContent="ShowContent" DeleteCurrentScript="RequestDeletion" UpdateCurrentScript="UpdateScript"></ScriptList>
+
+<LongTextDetails @ref="scriptContent"></LongTextDetails>
 
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteScript"></Confirmation>
 
 @code {
     private List<Script> scripts;
     private Confirmation deleteConfirmation;
+    private LongTextDetails scriptContent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,6 +27,13 @@
                                           "This action can not be undone.";
         deleteConfirmation.actionItem = script;
         deleteConfirmation.Show();
+    }
+
+    private void ShowContent(Script script)
+    {
+        scriptContent.HeaderContent = script.Name;
+        scriptContent.BodyContent = script.Content;
+        scriptContent.Show();
     }
 
     private void DeleteScript(Object o)
