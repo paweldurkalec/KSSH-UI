@@ -32,7 +32,9 @@ else
                     <tr>
                         <td>@script.Id</td>
                         <td>@script.Name</td>
-                        <td>@script.Content</td>
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-eye" @onclick="()=>ShowScriptContent.InvokeAsync(script)"></button>
+                        </td>
                         <td style="padding-left: 20px">
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentScript.InvokeAsync(script.Id)"></button>
                         </td>
@@ -50,6 +52,9 @@ else
 
     [Parameter]
     public List<Script> Scripts { get; set; }
+
+    [Parameter]
+    public EventCallback<Script> ShowScriptContent { get; set; }
 
     [Parameter]
     public EventCallback<Script> DeleteCurrentScript { get; set; }

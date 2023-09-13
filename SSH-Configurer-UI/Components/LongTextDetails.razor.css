@@ -1,0 +1,7 @@
+﻿.horizontal-scroll-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+.custom-textarea {
+    width: 100%; /* Ensure the textarea takes the full width of its container */
+}
