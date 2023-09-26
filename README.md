@@ -3,11 +3,9 @@ Front-end for application for configuration of groups of devices via SSH protoco
 
 ## TODO:
 
-rozróżnienie widoków add/update,
 walidacja,
-lepszy widok kluczy i skryptów,
-popup z potwierdzeniem usunięcia,
+lepszy widok skryptów,
 uwierzytelnienie,
 web sokiety, 
-cssy, 
+cssy ?, 
 testy
