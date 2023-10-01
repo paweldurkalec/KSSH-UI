@@ -122,7 +122,7 @@ namespace SSH_Configurer_UI.Services
         {
             try
             {
-                var response = await httpClient.DeleteAsync($"{group.Id}").ConfigureAwait(false);
+                var response = await httpClient.DeleteAsync($"{group.Id}/").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

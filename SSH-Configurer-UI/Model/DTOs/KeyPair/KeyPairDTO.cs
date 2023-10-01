@@ -2,7 +2,7 @@
 {
     public class KeyPairDTO
     {
-        //public string Name { get; set; }
+        public string name { get; set; }
         public string private_key_content { get; set; }
 
         public string public_key_content { get; set; }
@@ -11,7 +11,7 @@
 
         public KeyPairDTO(Model.KeyPair keyPair)
         {
-            //name = keyPair.Name;
+            name = keyPair.Name;
             public_key_content = keyPair.PublicKey;
             private_key_content = keyPair.PrivateKey;
         }

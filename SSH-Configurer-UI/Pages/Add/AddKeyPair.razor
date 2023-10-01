@@ -15,15 +15,15 @@
         keyPair = new KeyPair();
     }
 
-    private void SaveKeyPair()
+    private async Task SaveKeyPair()
     {
-        int response = keyPairService.Add(new KeyPair
+        int response = (await keyPairService.Add(new KeyPair
             {
                 Id = keyPair.Id,
                 Name = keyPair.Name,
                 PublicKey = keyPair.PublicKey,
                 PrivateKey = keyPair.PrivateKey
-            }).Result;
+            }));
         if (response == 0)
         {
             keyPair = new KeyPair();

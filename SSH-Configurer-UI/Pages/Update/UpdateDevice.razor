@@ -30,18 +30,26 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized(); 
-        device = deviceService.GetById(int.Parse(deviceId)).Result;
-        if(device is null)
-        {
-            stateMessage = "Device not found!";
-            stateColor = "red";
-        }
-        keys = keyPairService.GetAll().Result.ToList();
     }
 
-    private void SaveDevice()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        int response = deviceService.Update(int.Parse(deviceId), new Device
+        if (firstRender)
+        {
+            keys = (await keyPairService.GetAll()).ToList();
+            device = await deviceService.GetById(int.Parse(deviceId));
+            if (device is null)
+            {
+                stateMessage = "Device not found!";
+                stateColor = "red";
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveDevice()
+    {
+        int response = await deviceService.Update(int.Parse(deviceId), new Device
             {
                 Id = device.Id,
                 Name = device.Name,
@@ -50,10 +58,10 @@ else
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
                 Password = device.Password
-            }).Result;
+            });
         if (response == 0)
         {
-            device = deviceService.GetById(int.Parse(deviceId)).Result;
+            device = await deviceService.GetById(int.Parse(deviceId));
             feedback = "Device updated successfully.";
             color = "green";
         }

@@ -16,12 +16,21 @@
         base.OnInitialized();
         device = new Device();
         device.KeyPairId = 0;
-        keys = keyService.GetAll().Result.ToList();
+        keys = new();
     }
 
-    private void SaveDevice()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        int response = deviceService.Add(new Device
+        if (firstRender)
+        {
+            keys = (await keyService.GetAll()).ToList();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveDevice()
+    {
+        int response = (await deviceService.Add(new Device
             {
                 Name = device.Name,
                 Hostname = device.Hostname,
@@ -29,7 +38,7 @@
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
                 Password = device.Password
-            }).Result;
+            }));
         if(response == 0)
         {
             device = new Device();

@@ -9,15 +9,24 @@
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteScript"></Confirmation>
 
 @code {
-    private List<Script> scripts;
+    private List<Script> scripts = new();
     private Confirmation deleteConfirmation;
     private LongTextDetails scriptContent;
 
-    protected override async Task OnInitializedAsync()
-    {
-        scripts = scriptService.GetAll().Result.ToList();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     scripts = scriptService.GetAll().Result.ToList();
 
-        await base.OnInitializedAsync();
+    //     await base.OnInitializedAsync();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            scripts = (await scriptService.GetAll()).ToList();
+            StateHasChanged();
+        }
     }
 
     private async Task RequestDeletion(Script script)
@@ -36,13 +45,13 @@
         scriptContent.Show();
     }
 
-    private void DeleteScript(Object o)
+    private async Task DeleteScript(Object o)
     {
         Script script = (Script)o;
-        int result = scriptService.Remove(script).Result;
+        int result = await scriptService.Remove(script);
         if (result == 0)
         {
-            scripts = scriptService.GetAll().Result.ToList();
+            scripts = (await scriptService.GetAll()).ToList();
         }
     }
 

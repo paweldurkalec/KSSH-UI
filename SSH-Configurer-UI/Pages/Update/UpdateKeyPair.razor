@@ -28,26 +28,34 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        keyPair = keyPairService.GetById(int.Parse(keyPairId)).Result;
-        if (keyPair is null)
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            stateMessage = "KeyPair not found!";
-            stateColor = "red";
+            keyPair = await keyPairService.GetById(int.Parse(keyPairId));
+            if (keyPair is null)
+            {
+                stateMessage = "KeyPair not found!";
+                stateColor = "red";
+            }
+            StateHasChanged();
         }
     }
 
-    private void SaveKeyPair()
+    private async Task SaveKeyPair()
     {
-        int response = keyPairService.Update(int.Parse(keyPairId), new KeyPair
+        int response = await keyPairService.Update(int.Parse(keyPairId), new KeyPair
             {
                 Id = keyPair.Id,
                 Name = keyPair.Name,
                 PublicKey = keyPair.PublicKey,
                 PrivateKey = keyPair.PrivateKey
-            }).Result;
+            });
         if (response == 0)
         {
-            keyPair = keyPairService.GetById(int.Parse(keyPairId)).Result;
+            keyPair = await keyPairService.GetById(int.Parse(keyPairId));
             feedback = "KeyPair updated successfully.";
             color = "green";
         }

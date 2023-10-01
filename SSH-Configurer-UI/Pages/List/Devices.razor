@@ -7,14 +7,23 @@
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteDevice"></Confirmation>
 
 @code {
-    private List<Device> devices;
+    private List<Device> devices = new();
     private Confirmation deleteConfirmation;
 
-    protected override async Task OnInitializedAsync()
-    {
-        devices = (await deviceService.GetAll()).ToList();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     devices = (await deviceService.GetAll()).ToList();
 
-        await base.OnInitializedAsync();
+    //     await base.OnInitializedAsync();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            devices = (await deviceService.GetAll()).ToList();
+            StateHasChanged();
+        }
     }
 
     private async Task RequestDeletion(Device device)
@@ -29,9 +38,9 @@
     private async Task DeleteDevice(Object o)
     {
         Device device = (Device)o;
-        int result = deviceService.Remove(device).Result;
+        int result = await deviceService.Remove(device);
         if(result==0){
-            devices = (deviceService.GetAll()).Result.ToList();
+            devices = (await (deviceService.GetAll())).ToList();
         }    
     }
 

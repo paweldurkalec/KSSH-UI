@@ -1,0 +1,49 @@
+﻿@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Model.DTOs
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@login" OnValidSubmit="@Submit">
+    <DataAnnotationsValidator />
+
+    <div>Username:</div>
+    <ValidationMessage For="(() => login.username)" />
+    <InputText class="form-control" placeholder="Username" @bind-Value="@login.username"></InputText><br />
+
+    <div>Password:</div>
+    <ValidationMessage For="(() => login.password)" />
+    <InputText class="form-control" placeholder="Password" @bind-Value="@login.password" type="password"></InputText><br />
+
+    <div style="color: @color">@feedback</div><br />
+    <button onclick="@Reset" class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public SSH_Configurer_UI.Model.DTOs.Authentication.LoginModel login { get; set; }
+
+    [Parameter]
+    public EventCallback submitLogin { get; set; }
+
+    [Parameter]
+    public EventCallback resetFeedback { get; set; }
+
+    [Parameter]
+    public string color { get; set; }
+
+    [Parameter]
+    public string feedback { get; set; }
+
+    private void Submit()
+    {
+        submitLogin.InvokeAsync();
+    }
+
+    private void Reset()
+    {
+        resetFeedback.InvokeAsync();
+    }
+}
