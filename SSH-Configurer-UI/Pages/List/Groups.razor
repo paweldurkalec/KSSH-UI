@@ -7,14 +7,23 @@
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteGroup"></Confirmation>
 
 @code {
-    private List<Group> groups;
+    private List<Group> groups = new();
     private Confirmation deleteConfirmation;
 
-    protected override async Task OnInitializedAsync()
-    {
-        groups = groupService.GetAll().Result.ToList();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     groups = groupService.GetAll().Result.ToList();
 
-        await base.OnInitializedAsync();
+    //     await base.OnInitializedAsync();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            groups = (await groupService.GetAll()).ToList();
+            StateHasChanged();
+        }
     }
 
     private async Task RequestDeletion(Group group)
@@ -27,13 +36,13 @@
         deleteConfirmation.Show();
     }
 
-    private void DeleteGroup(Object o)
+    private async Task DeleteGroup(Object o)
     {
         Group group = (Group)o;
-        int result = groupService.Remove(group).Result;
+        int result = await groupService.Remove(group);
         if (result == 0)
         {
-            groups = (groupService.GetAll()).Result.ToList();
+            groups = (await groupService.GetAll()).ToList();
         }
     }
 

@@ -20,20 +20,30 @@
     {
         base.OnInitialized();
         group = new Group();
-        keys = keyService.GetAll().Result.ToList();
-        devices = deviceService.GetAll().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+        keys = new();
+        devices = new();
     }
 
-    private void SaveGroup()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            keys = (await keyService.GetAll()).ToList();
+            devices = (await deviceService.GetAll()).Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveGroup()
     {
         List<int> deviceIds = devices.Where(device => device.IsSelected == true).Select(device => device.Id).ToList();
 
-        int response = groupService.Add(new Group
+        int response = (await groupService.Add(new Group
             {
                 Name = group.Name,
                 KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
-            }).Result;
+            }));
 
         if (response == 0)
         {

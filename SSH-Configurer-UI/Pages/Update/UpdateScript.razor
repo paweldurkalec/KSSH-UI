@@ -29,25 +29,33 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        script = scriptService.GetById(int.Parse(scriptId)).Result;
-        if (script is null)
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            stateMessage = "Script not found!";
-            stateColor = "red";
+            script = await scriptService.GetById(int.Parse(scriptId));
+            if (script is null)
+            {
+                stateMessage = "Script not found!";
+                stateColor = "red";
+            }
+            StateHasChanged();
         }
     }
 
-    private void SaveScript()
+    private async Task SaveScript()
     {
-        int response = scriptService.Update(int.Parse(scriptId), new Script
+        int response = await scriptService.Update(int.Parse(scriptId), new Script
             {
                 Id = script.Id,
                 Name = script.Name,
                 Content = script.Content,
-            }).Result;
+            });
         if (response == 0)
         {
-            script = scriptService.GetById(int.Parse(scriptId)).Result;
+            script = await scriptService.GetById(int.Parse(scriptId));
             feedback = "Script updated successfully.";
             color = "green";
         }

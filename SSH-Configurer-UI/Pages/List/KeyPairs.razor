@@ -7,14 +7,23 @@
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteKeyPair"></Confirmation>
 
 @code {
-    private List<KeyPair> keyPairs;
+    private List<KeyPair> keyPairs = new();
     private Confirmation deleteConfirmation;
 
-    protected override async Task OnInitializedAsync()
-    {
-        keyPairs = keyPairService.GetAll().Result.ToList();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     keyPairs = keyPairService.GetAll().Result.ToList();
 
-        await base.OnInitializedAsync();
+    //     await base.OnInitializedAsync();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            keyPairs = (await keyPairService.GetAll()).ToList();
+            StateHasChanged();
+        }
     }
 
     private async Task RequestDeletion(KeyPair keyPair)
@@ -26,13 +35,13 @@
         deleteConfirmation.Show();
     }
 
-    private void DeleteKeyPair(Object o)
+    private async Task DeleteKeyPair(Object o)
     {
         KeyPair keyPair = (KeyPair)o;
-        int result = keyPairService.Remove(keyPair).Result;
+        int result = await keyPairService.Remove(keyPair);
         if (result == 0)
         {
-            keyPairs = keyPairService.GetAll().Result.ToList();
+            keyPairs = (await keyPairService.GetAll()).ToList();
         }
     }
 

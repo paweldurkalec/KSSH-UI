@@ -36,37 +36,45 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        group = groupService.GetById(int.Parse(groupId)).Result;
-        if (group is null)
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            stateMessage = "Group not found!";
-            stateColor = "red";
-        }
-        keys = keyPairService.GetAll().Result.ToList();
-        devices = deviceService.GetAll().Result.Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
-        List<Device> groupsDevices = deviceService.GetByIds(group.DeviceIds).Result.ToList();
-        List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();
-        foreach(DeviceSelect device in devicesToPreSelect)
-        {
-            device.IsSelected = true;
+            group = await groupService.GetById(int.Parse(groupId));
+            if (group is null)
+            {
+                stateMessage = "Group not found!";
+                stateColor = "red";
+            }
+            keys = (await keyPairService.GetAll()).ToList();
+            devices = (await deviceService.GetAll()).Select(device => new DeviceSelect(device.Id, device.Name, device.Hostname, isSelected: false)).ToList();
+            List<Device> groupsDevices = (await deviceService.GetByIds(group.DeviceIds)).ToList();
+            List<DeviceSelect> devicesToPreSelect = devices.Where(device => groupsDevices.Any(d => d.Id == device.Id)).ToList();
+            foreach (DeviceSelect device in devicesToPreSelect)
+            {
+                device.IsSelected = true;
+            }
+            StateHasChanged();
         }
     }
 
-    private void UpdateCurrentGroup()
+    private async Task UpdateCurrentGroup()
     {
         List<int> deviceIds = devices.Where(device => device.IsSelected == true).Select(device => device.Id).ToList();
 
-        int response = groupService.Update(int.Parse(groupId), new Group
+        int response = await groupService.Update(int.Parse(groupId), new Group
             {
                 Id = group.Id,
                 Name = group.Name,
                 KeyPairId = group.KeyPairId,
                 DeviceIds = deviceIds
-            }).Result;
+            });
 
         if (response == 0)
         {
-            group = groupService.GetById(int.Parse(groupId)).Result;
+            group = await groupService.GetById(int.Parse(groupId));
             devices.ForEach(device => device.IsSelected = false);
             feedback = "Group added successfully.";
             color = "green";

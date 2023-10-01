@@ -29,8 +29,7 @@ namespace SSH_Configurer_UI.Model
         public KeyPair(KeyPairDTOId keyPair) 
         {
             Id = keyPair.id;
-            // TODO 
-            Name = "placeholder";
+            Name = keyPair.name;
             PublicKey = keyPair.public_key_content;
             PrivateKey = keyPair.private_key_content;
         }

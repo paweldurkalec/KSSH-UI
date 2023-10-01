@@ -15,13 +15,13 @@
         script = new Script();
     }
 
-    private void SaveScript()
+    private async Task SaveScript()
     {
-        int response = scriptService.Add(new Script
+        int response = (await scriptService.Add(new Script
             {
                 Name = script.Name,
                 Content = script.Content
-            }).Result;
+            }));
         if (response == 0)
         {
             script = new Script();

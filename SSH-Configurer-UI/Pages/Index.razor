@@ -1,9 +1,46 @@
 ﻿@page "/"
+@using SSH_Configurer_UI.Model.DTOs.Authentication
+@inject IAuthenticationService AuthenticationService;
 
-<PageTitle>Index</PageTitle>
+<fieldset disabled="@(feedbackLogin is not null)">
+    <Login login="@model" color="@color" resetFeedback="@ResetFeedback" submitLogin="@SubmitAsync" feedback=""></Login>
+</fieldset>
 
-<h1>Hello, Olka!</h1>
+@if (feedbackLogin is not null)
+{
+    <p>You are logged in.</p>
+}
 
-Welcome to your new app.
+@if (errorMessage is not null)
+{
+    <p class="error">@errorMessage</p>
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private LoginModel model = new();
+    private int? feedbackLogin;
+    private string? errorMessage;
+    string color = "green";
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            feedbackLogin = await AuthenticationService.LoginAsync(model);
+
+            errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            feedbackLogin = null;
+
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void ResetFeedback()
+    {
+        //feedback = "";
+        color = "";
+    }
+}
