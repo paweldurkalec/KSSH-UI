@@ -1,12 +1,12 @@
 ﻿@using SSH_Configurer_UI.Model;
 
-@if (Devices is null)
+@if (DeviceStatuses is null)
 {
     <br />
     <span>Devices are loading...</span>
     <br />
 }
-else if (Devices.Count == 0)
+else if (DeviceStatuses.Count == 0)
 {
     <br />
     <span>No devices to display</span>
@@ -23,12 +23,12 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var device in Devices)
+            @foreach (var deviceStatus in DeviceStatuses)
             {
                <tr>
-                    <td>@device.Name</td>
-                    <td>@device.Hostname</td>
-                    <td>@device.Status</td>
+                    <td>@deviceStatus.device.Name</td>
+                    <td>@deviceStatus.device.Hostname</td>
+                    <td>@deviceStatus.status</td>
                </tr>
             }
         </tbody>
@@ -38,5 +38,5 @@ else
 @code {
 
     [Parameter]
-    public List<DeviceStatus> Devices { get; set; }
+    public List<DeviceStatus> DeviceStatuses { get; set; }
 }

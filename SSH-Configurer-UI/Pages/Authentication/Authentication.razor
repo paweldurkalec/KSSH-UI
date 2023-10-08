@@ -1,0 +1,41 @@
+﻿@page "/authentication"
+@inject NavigationManager navManager;
+@inject IAuthenticationService authService;
+
+@code {
+    private bool isRegistered = true;
+
+    private async Task CheckRegistrationStatus()
+    {
+        isRegistered = await authService.CheckIfUserExists();
+    }
+
+    private void RedirectToLogin()
+    {
+        navManager.NavigateTo("/login");
+    }
+
+    private void RedirectToRegister()
+    {
+        navManager.NavigateTo("/register");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await CheckRegistrationStatus();
+
+        if (isRegistered)
+        {
+            RedirectToLogin();
+        }
+        else
+        {
+            RedirectToRegister();
+        }
+    }
+}
+
+@if (isRegistered)
+{
+    <p>Loading...</p>
+}

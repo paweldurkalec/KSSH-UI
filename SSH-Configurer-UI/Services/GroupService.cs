@@ -5,6 +5,8 @@ using SSH_Configurer_UI.Pages.List;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json;
 using SSH_Configurer_UI.Services.Interfaces;
+using SSH_Configurer_UI.Model.DTOs.Async;
+using Newtonsoft.Json.Linq;
 
 namespace SSH_Configurer_UI.Services
 {
@@ -15,6 +17,21 @@ namespace SSH_Configurer_UI.Services
         public GroupService(HttpClient httpClient)
         {
             this.httpClient = httpClient;
+        }
+
+        public async Task<string?> CheckConnection(int id)
+        {
+            var response = await httpClient.PostAsync($"{id}/async_check_connection/", null).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Read the response content as a string
+                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var jsonObject = JObject.Parse(responseContent);
+                string requestUuid = jsonObject["request_uuid"].ToString();
+                return requestUuid;
+            }
+            return null;
         }
 
         public async Task<int> Add(Group group)

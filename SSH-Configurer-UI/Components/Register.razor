@@ -1,0 +1,53 @@
+﻿@using SSH_Configurer_UI.Model;
+@using SSH_Configurer_UI.Model.DTOs
+@using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@register" OnValidSubmit="@Submit">
+    <DataAnnotationsValidator />
+
+    <div>Username:</div>
+    <ValidationMessage For="(() => register.username)" />
+    <InputText class="form-control" placeholder="Username" @bind-Value="@register.username"></InputText><br />
+
+    <div>Password:</div>
+    <ValidationMessage For="(() => register.password)" />
+    <InputText class="form-control" placeholder="Password" @bind-Value="@register.password" type="password"></InputText><br />
+
+    <div>Repeat password:</div>
+    <ValidationMessage For="(() => register.password)" />
+    <InputText class="form-control" placeholder="Password" @bind-Value="@register.password2" type="password"></InputText><br />
+
+    <div style="color: @color">@feedback</div><br />
+    <button onclick="@Reset" class="btn btn-primary" type="submit">Register</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public SSH_Configurer_UI.Model.DTOs.Authentication.RegisterModel register { get; set; }
+
+    [Parameter]
+    public EventCallback submitRegister { get; set; }
+
+    [Parameter]
+    public EventCallback resetFeedback { get; set; }
+
+    [Parameter]
+    public string color { get; set; }
+
+    [Parameter]
+    public string feedback { get; set; }
+
+    private void Submit()
+    {
+        submitRegister.InvokeAsync();
+    }
+
+    private void Reset()
+    {
+        resetFeedback.InvokeAsync();
+    }
+}

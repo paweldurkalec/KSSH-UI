@@ -1,16 +1,21 @@
 ﻿@page "/run-script"
 @using SSH_Configurer_UI.Model;
 @using SSH_Configurer_UI.Components
+@using SSH_Configurer_UI.Model.DTOs.Async;
 @using SSH_Configurer_UI.Services
 @inject IContentService<Group> groupService
 @inject IContentService<Device> deviceService
 @inject IContentService<Script> scriptService
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Net.WebSockets
+@using System.Text
+@using Newtonsoft.Json
+
 
 <EditForm Model="@configurationProcess" OnValidSubmit="@Run">
     <div>Group of devices:</div>
-    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId">
+    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId" onchange="@HandleGroupSelection()">
         @if (allGroups.Count > 0)
         {
             @foreach (var group in allGroups)
@@ -39,41 +44,56 @@
         }
     </InputSelect><br />
 
+
+
     <div style="color: @color">@feedback</div><br />
     <button onclick="@ResetFeedback" class="btn btn-primary" type="submit">Run</button>
 </EditForm>
+<br />
 
-@if(devicesBeingConfigured.Count > 0)
-{
-    <br />
-    <br />
-    <DeviceStatusList Devices="@devicesBeingConfigured"></DeviceStatusList>
-}
+<br />
+<br />
+<DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses"></DeviceStatusList>
+<br />
+<br />
+<button @onclick="CheckConnection" class="btn btn-primary">Check Connection</button>
+
 
 @code {
     ConfigurationProcess configurationProcess;
+    ClientWebSocket webSocket = new ClientWebSocket();
     List<Group> allGroups;
     List<Script> allScripts;
-    List<DeviceStatus> devicesBeingConfigured;
+    int prevGroupChoice = -1;
     string feedback = "";
     string color = "";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        configurationProcess = new(-1,-1, "new");
-        devicesBeingConfigured = new();
-        allGroups = groupService.GetAll().Result.ToList();
-        allScripts = scriptService.GetAll().Result.ToList();
+        configurationProcess = new();
+        configurationProcess.GroupId = -1;
+        configurationProcess.ScriptId = -1;
+        configurationProcess.request_uuid = "";
+        allGroups = new();
+        allScripts = new();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await webSocket.ConnectAsync(new Uri("ws://127.0.0.1:8000/ws/"), CancellationToken.None);
+            _ = ReceiveLoop();
+            allGroups = (await groupService.GetAll()).ToList();
+            allScripts = (await scriptService.GetAll()).ToList();
+            StateHasChanged();
+        }
     }
 
     private void Run()
     {
 
-        if (configurationProcess.ScriptId != -1 && configurationProcess.GroupId != -1){
-            Group selectedGroup = groupService.GetById(configurationProcess.GroupId).Result;
-            devicesBeingConfigured = deviceService.GetByIds(selectedGroup.DeviceIds).Result.Select(device => new DeviceStatus(device)).ToList();
-        }
     }
 
 
@@ -81,5 +101,52 @@
     {
         feedback = "";
         color = "";
+    }
+
+    async Task CheckConnection()
+    {
+        var gs = (GroupService)groupService;
+        string? uuid = await gs.CheckConnection(configurationProcess.GroupId);
+        if(uuid != null)
+        {
+            configurationProcess.request_uuid = uuid;
+        }
+    }
+
+    async Task HandleGroupSelection()
+    {
+        if (configurationProcess.GroupId != prevGroupChoice)
+        {
+            prevGroupChoice = configurationProcess.GroupId;
+            Group group = await groupService.GetById(configurationProcess.GroupId);
+            List<Device> groupDevices = (await deviceService.GetByIds(group.DeviceIds)).ToList();
+            configurationProcess.SetDevices(groupDevices);
+            StateHasChanged();
+        }
+    }
+
+    async Task ReceiveLoop()
+    {
+        var buffer = new ArraySegment<byte>(new byte[100 * 1024]);
+        while (true)
+        {
+            // Note that the received block might only be part of a larger message. If this applies in your scenario,
+            // check the received.EndOfMessage and consider buffering the blocks until that property is true.
+            // Or use a higher-level library such as SignalR.
+            var received = await webSocket.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
+            var receivedAsText = Encoding.UTF8.GetString(buffer.Array, 0, received.Count);
+
+            var asyncResponse = JsonConvert.DeserializeObject<AsyncResponse>(receivedAsText);
+
+            if(asyncResponse.message.request_uuid == configurationProcess.request_uuid)
+            {
+                DeviceStatus deviceStatus = configurationProcess.deviceStatuses.Where(ds => ds.device.Id == asyncResponse.message.device).First();
+                deviceStatus.status = asyncResponse.message.status;
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+            }
+        }
     }
 }

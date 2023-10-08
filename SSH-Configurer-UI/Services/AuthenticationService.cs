@@ -28,6 +28,18 @@ namespace SSH_Configurer_UI.Services
 
         public event Action<string?>? LoginChange;
 
+        public async Task<bool> CheckIfUserExists()
+        {
+            var response = await _httpClient.GetFromJsonAsync<UserExistsResponse>("user_exists").ConfigureAwait(false);
+
+            if (response is null)
+            {
+                return false;
+            }
+
+            return response.exists;
+        }
+
         private bool shouldRefresh()
         {
             DateTime currentDateTime = DateTime.Now;
@@ -105,6 +117,22 @@ namespace SSH_Configurer_UI.Services
             _jwtCache = null;
 
             LoginChange?.Invoke(null);
+        }
+
+        public async Task<int> RegisterAsync(RegisterModel credentials)
+        {
+            string serialized = JsonSerializer.Serialize(credentials);
+            var bytes = MyUtils.ConvertToBytes(serialized);
+
+            var response = await _httpClient.PostAsync("register/", bytes).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new UnauthorizedAccessException("Register failed!");
+            }
+
+
+            return 0;
         }
 
         public async Task<int> LoginAsync(LoginModel credentials)
