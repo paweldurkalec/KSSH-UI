@@ -62,6 +62,8 @@ namespace SSH_Configurer_UI
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseWebSockets();
+
 
             app.UseStaticFiles();
 

@@ -1,0 +1,45 @@
+﻿@page "/login"
+@using SSH_Configurer_UI.Model.DTOs.Authentication
+@inject IAuthenticationService AuthenticationService;
+
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
+
+<fieldset disabled="@(feedbackLogin is not null)">
+    <Login login="@model" color="@color" resetFeedback="@ResetFeedback" submitLogin="@SubmitAsync" feedback="@errorMessage"></Login>
+</fieldset>
+
+@code {
+    private LoginModel model = new();
+    private int? feedbackLogin;
+    private string? errorMessage = "";
+    string color = "green";
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            feedbackLogin = await AuthenticationService.LoginAsync(model);
+
+            errorMessage = "Successfully logged in.";
+            color = "green";
+        }
+        catch (Exception ex)
+        {
+            feedbackLogin = null;
+
+            errorMessage = ex.Message;
+            color = "red";
+        }
+        StateHasChanged();
+    }
+
+    private void ResetFeedback()
+    {
+        errorMessage = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Log in using username and password provided during registration.";
+    }
+}

@@ -1,0 +1,45 @@
+﻿@page "/register"
+@using SSH_Configurer_UI.Model.DTOs.Authentication
+@inject IAuthenticationService AuthenticationService;
+
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
+
+<fieldset disabled="@(feedbackRegister is not null)">
+    <Register register="@model" color="@color" resetFeedback="@ResetFeedback" submitRegister="@SubmitAsync" feedback="@errorMessage"></Register>
+</fieldset>
+
+@code {
+    private RegisterModel model = new();
+    private int? feedbackRegister;
+    private string? errorMessage = "";
+    string color = "green";
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            feedbackRegister = await AuthenticationService.RegisterAsync(model);
+
+            errorMessage = "Successfully registered. Click Authentication again in order to log in.";
+            string color = "green";
+        }
+        catch (Exception ex)
+        {
+            feedbackRegister = null;
+
+            errorMessage = ex.Message;
+            color = "red";
+        }
+        StateHasChanged();
+    }
+
+    private void ResetFeedback()
+    {
+        errorMessage = "";
+    }
+
+    private string getTopInfo()
+    {
+        return $"Registration. Please keep credentials in secure place. Losing it will mean losing all data.";
+    }
+}
