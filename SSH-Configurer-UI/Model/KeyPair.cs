@@ -31,7 +31,7 @@ namespace SSH_Configurer_UI.Model
             Id = keyPair.id;
             Name = keyPair.name;
             PublicKey = keyPair.public_key_content;
-            PrivateKey = keyPair.private_key_content;
+            PrivateKey = "";
         }
     }
 }

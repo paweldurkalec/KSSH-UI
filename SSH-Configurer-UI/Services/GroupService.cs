@@ -34,6 +34,30 @@ namespace SSH_Configurer_UI.Services
             return null;
         }
 
+        public async Task<string?> RunScript(int groupId, int scriptId)
+        {
+            var requestBody = new
+            {
+                script = $"{scriptId}"
+            };
+
+            string serialized = JsonSerializer.Serialize(requestBody);
+
+            var bytes = MyUtils.ConvertToBytes(serialized);
+
+            var response = await httpClient.PostAsync($"{groupId}/async_run_script/", bytes).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Read the response content as a string
+                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var jsonObject = JObject.Parse(responseContent);
+                string requestUuid = jsonObject["request_uuid"].ToString();
+                return requestUuid;
+            }
+            return null;
+        }
+
         public async Task<int> Add(Group group)
         {
             try

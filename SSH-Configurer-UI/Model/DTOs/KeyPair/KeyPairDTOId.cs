@@ -4,7 +4,6 @@
     {
         public int id { get; set; }
         public string name { get; set; }
-        public string private_key_content { get; set; }
 
         public string public_key_content { get; set; }
 
@@ -15,7 +14,6 @@
             id = keyPair.Id;
             name = keyPair.Name;
             public_key_content = keyPair.PublicKey;
-            private_key_content = keyPair.PrivateKey;
         }
     }
 }

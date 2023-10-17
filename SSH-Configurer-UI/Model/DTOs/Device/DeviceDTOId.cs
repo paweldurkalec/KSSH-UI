@@ -17,8 +17,6 @@ namespace SSH_Configurer_UI.Model.DTOs.Device
         public string username { get; set; }
 
         public int? key_pair { get; set; }
-
-        public string? password { get; set; }
         public DeviceDTOId() { }
 
         public DeviceDTOId(Model.Device device)
@@ -29,7 +27,6 @@ namespace SSH_Configurer_UI.Model.DTOs.Device
             port = device.Port;
             username = device.Username;
             key_pair = device.KeyPairId > 0 ? device.KeyPairId : null;
-            password = device.Password != "" ? device.Password : null;
         }
     }
 }

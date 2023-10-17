@@ -27,6 +27,7 @@
     <InputSelect class="form-control" TValue="int" @bind-Value="@device.KeyPairId">
         @if (keys.Count > 0)
         {
+            <option value=-1></option>
             @foreach (var key in keys)
             {
                 <option value=@key.Id>@key.Name</option>
