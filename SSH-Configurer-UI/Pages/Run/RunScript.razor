@@ -13,11 +13,15 @@
 @using Newtonsoft.Json
 
 
-<EditForm Model="@configurationProcess" OnValidSubmit="@Run">
+<EditForm Model="@configurationProcess" OnValidSubmit="@CheckConnection">
+    <DataAnnotationsValidator />
+
     <div>Group of devices:</div>
+    <ValidationMessage For="(() => configurationProcess.GroupId)" />
     <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId" onchange="@HandleGroupSelection()">
         @if (allGroups.Count > 0)
         {
+            <option value=-1></option>
             @foreach (var group in allGroups)
             {
                 <option value=@group.Id>@group.Name</option>
@@ -30,9 +34,11 @@
     </InputSelect><br />
 
     <div>Script to run:</div>
+    <ValidationMessage For="(() => configurationProcess.ScriptId)" />
     <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.ScriptId">
         @if (allScripts.Count > 0)
         {
+            <option value=-1></option>
             @foreach (var script in allScripts)
             {
                 <option value=@script.Id>@script.Name</option>
@@ -47,7 +53,7 @@
 
 
     <div style="color: @color">@feedback</div><br />
-    <button onclick="@ResetFeedback" class="btn btn-primary" type="submit">Run</button>
+    <button class="btn btn-primary" type="submit">Check connection</button>
 </EditForm>
 <br />
 
@@ -56,7 +62,16 @@
 <DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses"></DeviceStatusList>
 <br />
 <br />
-<button @onclick="CheckConnection" class="btn btn-primary">Check Connection</button>
+<div style="color: @runButtonFeedbackColor">@runButtonFeedback</div>
+<br />
+@if (isButtonDisabled)
+{
+    <button @onclick="RunButton" class="btn btn-primary" disabled>Run script</button>
+}
+else
+{
+    <button @onclick="RunButton" class="btn btn-primary">Run script</button>
+}
 
 
 @code {
@@ -67,6 +82,10 @@
     int prevGroupChoice = -1;
     string feedback = "";
     string color = "";
+
+    string runButtonFeedback = "";
+    string runButtonFeedbackColor = "";
+    bool isButtonDisabled = false;
 
     protected override void OnInitialized()
     {
@@ -91,20 +110,49 @@
         }
     }
 
-    private void Run()
+    private async Task RunButton()
     {
+        if(configurationProcess.deviceStatuses.Count == 0)
+        {
+            runButtonFeedback = "No devices to configure.";
+            runButtonFeedbackColor = "red";
+        }
+        else if (configurationProcess.AllValid())
+        {
+            runButtonFeedback = "Process initialized, please wait...";
+            runButtonFeedbackColor = "black";
+            isButtonDisabled = true;
 
+            foreach (var ds in configurationProcess.deviceStatuses)
+            {
+                ds.status = "During configuration";
+            }
+
+            await Run();
+        }
+        else
+        {
+            runButtonFeedback = "Not all connections are valid.";
+            runButtonFeedbackColor = "red";
+        }
     }
 
-
-    private void ResetFeedback()
+    private async Task Run()
     {
-        feedback = "";
-        color = "";
+        var gs = (GroupService)groupService;
+
+        string? uuid = await gs.RunScript(configurationProcess.GroupId, configurationProcess.ScriptId);
+        if (uuid != null)
+        {
+            configurationProcess.request_uuid = uuid;
+            configurationProcess.status = ConfigurationStatuses.RUNNING;
+        }
     }
 
     async Task CheckConnection()
-    {
+    {     
+        await ResetState();
+
         var gs = (GroupService)groupService;
         string? uuid = await gs.CheckConnection(configurationProcess.GroupId);
         if(uuid != null)
@@ -115,7 +163,7 @@
 
     async Task HandleGroupSelection()
     {
-        if (configurationProcess.GroupId != prevGroupChoice)
+        if (configurationProcess.GroupId != prevGroupChoice && configurationProcess.GroupId != -1)
         {
             prevGroupChoice = configurationProcess.GroupId;
             Group group = await groupService.GetById(configurationProcess.GroupId);
@@ -142,11 +190,29 @@
             {
                 DeviceStatus deviceStatus = configurationProcess.deviceStatuses.Where(ds => ds.device.Id == asyncResponse.message.device).First();
                 deviceStatus.status = asyncResponse.message.status;
+                if (configurationProcess.status == ConfigurationStatuses.RUNNING)
+                {
+                    if (configurationProcess.AllValid())
+                    {
+                        configurationProcess.status = ConfigurationStatuses.FINISHED;
+                        runButtonFeedback = "Process finished";
+                        runButtonFeedbackColor = "green";
+                    }
+                }
                 await InvokeAsync(() =>
                 {
                     StateHasChanged();
                 });
             }
         }
+    }
+
+    async Task ResetState()
+    {
+        feedback = "";
+        color = "";
+        runButtonFeedback = "";
+        runButtonFeedbackColor = "";
+        isButtonDisabled = false;
     }
 }

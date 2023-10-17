@@ -74,7 +74,7 @@ namespace SSH_Configurer_UI.Model
             Port = deviceDTO.port;
             Username = deviceDTO.username;
             KeyPairId = deviceDTO.key_pair ?? -1;
-            Password = deviceDTO.password ?? "";
+            Password = "";
         }
     }
 }
