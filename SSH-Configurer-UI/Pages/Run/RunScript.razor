@@ -6,6 +6,7 @@
 @inject IContentService<Group> groupService
 @inject IContentService<Device> deviceService
 @inject IContentService<Script> scriptService
+@inject IConfiguration configuration
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Net.WebSockets
@@ -102,7 +103,7 @@ else
     {
         if (firstRender)
         {
-            await webSocket.ConnectAsync(new Uri("ws://127.0.0.1:8000/ws/"), CancellationToken.None);
+            await webSocket.ConnectAsync(new Uri($"{configuration["BACKEND_URI"]}/ws/"), CancellationToken.None);
             _ = ReceiveLoop();
             allGroups = (await groupService.GetAll()).ToList();
             allScripts = (await scriptService.GetAll()).ToList();
