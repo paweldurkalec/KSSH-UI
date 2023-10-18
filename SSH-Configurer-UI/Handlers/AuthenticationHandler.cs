@@ -8,17 +8,19 @@ namespace SSH_Configurer_UI.Handlers
     public class AuthenticationHandler : DelegatingHandler
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly IConfiguration _configuration;
         private bool _refreshing;
 
-        public AuthenticationHandler(IAuthenticationService authenticationService) : base(new HttpClientHandler())
+        public AuthenticationHandler(IAuthenticationService authenticationService, IConfiguration configuration) : base(new HttpClientHandler())
         {
             _authenticationService = authenticationService;
+            _configuration = configuration;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var jwt = await _authenticationService.GetJwtAsync().ConfigureAwait(false);
-            var isToServer = request.RequestUri?.AbsoluteUri.StartsWith("http://127.0.0.1:8000" ?? "") ?? false;
+            var isToServer = request.RequestUri?.AbsoluteUri.StartsWith(_configuration["BACKEND_URI"] ?? "") ?? false;
 
             if (isToServer && !string.IsNullOrEmpty(jwt))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt);

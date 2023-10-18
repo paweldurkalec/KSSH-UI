@@ -25,6 +25,7 @@ namespace SSH_Configurer_UI.Services
         private const string JWT_REFRESH_KEY = nameof(JWT_REFRESH_KEY);
         private string? _jwtCache;
         private string? _jwtRefreshCache;
+        private readonly IConfiguration _configuration;
 
         public event Action<string?>? LoginChange;
 
@@ -72,11 +73,12 @@ namespace SSH_Configurer_UI.Services
             _accessRefresh = DateTime.Now;
         }
 
-        public AuthenticationService(ISessionStorageService sessionStorageService)
+        public AuthenticationService(ISessionStorageService sessionStorageService, IConfiguration configuration)
         {
+            _configuration = configuration;
             var httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://127.0.0.1:8000/auth/")
+                BaseAddress = new Uri($"{configuration["BACKEND_URI"]}/auth/")
             };
             _httpClient = httpClient;
             _sessionStorageService = sessionStorageService;
