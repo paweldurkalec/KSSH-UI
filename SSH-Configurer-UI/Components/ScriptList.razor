@@ -32,13 +32,13 @@ else
                     <tr>
                         <td>@script.Id</td>
                         <td>@script.Name</td>
-                        <td style="padding-left: 20px">
+                        <td>
                             <button class="oi oi-eye" @onclick="()=>ShowScriptContent.InvokeAsync(script)"></button>
                         </td>
-                        <td style="padding-left: 20px">
+                        <td>
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentScript.InvokeAsync(script.Id)"></button>
                         </td>
-                        <td style="padding-left: 20px">
+                        <td>
                             <button class="oi oi-trash" @onclick="()=>DeleteCurrentScript.InvokeAsync(script)"></button>
                         </td>
                     </tr>

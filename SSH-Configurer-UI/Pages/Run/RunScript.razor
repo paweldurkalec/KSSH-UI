@@ -60,7 +60,7 @@
 
 <br />
 <br />
-<DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses"></DeviceStatusList>
+<DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses" ShowWindow="@ShowTextWindow"></DeviceStatusList>
 <br />
 <br />
 <div style="color: @runButtonFeedbackColor">@runButtonFeedback</div>
@@ -74,6 +74,7 @@ else
     <button @onclick="RunButton" class="btn btn-primary">Run script</button>
 }
 
+<LongTextDetails @ref="textWindow"></LongTextDetails>
 
 @code {
     ConfigurationProcess configurationProcess;
@@ -88,6 +89,9 @@ else
     string runButtonFeedbackColor = "";
     bool isButtonDisabled = false;
 
+    private LongTextDetails textWindow;
+
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -97,13 +101,14 @@ else
         configurationProcess.request_uuid = "";
         allGroups = new();
         allScripts = new();
+        textWindow = new();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await webSocket.ConnectAsync(new Uri($"{configuration["BACKEND_URI"]}/ws/"), CancellationToken.None);
+            await webSocket.ConnectAsync(new Uri($"{configuration["BACKEND_WS"]}/"), CancellationToken.None);
             _ = ReceiveLoop();
             allGroups = (await groupService.GetAll()).ToList();
             allScripts = (await scriptService.GetAll()).ToList();
@@ -191,6 +196,8 @@ else
             {
                 DeviceStatus deviceStatus = configurationProcess.deviceStatuses.Where(ds => ds.device.Id == asyncResponse.message.device).First();
                 deviceStatus.status = asyncResponse.message.status;
+                deviceStatus.standardOutput = asyncResponse.message.result_std;
+                deviceStatus.standardError = asyncResponse.message.result_err;
                 if (configurationProcess.status == ConfigurationStatuses.RUNNING)
                 {
                     if (configurationProcess.AllValid())
@@ -206,6 +213,13 @@ else
                 });
             }
         }
+    }
+
+    private void ShowTextWindow(LongTextDetails inputWindow)
+    {
+        this.textWindow.BodyContent = inputWindow.BodyContent;
+        this.textWindow.HeaderContent = inputWindow.HeaderContent;
+        this.textWindow.Show();
     }
 
     async Task ResetState()
