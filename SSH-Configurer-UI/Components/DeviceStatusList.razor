@@ -20,6 +20,9 @@ else
                 <th>Name</th>
                 <th>Hostname</th>
                 <th>Status</th>
+                <th>Warnings</th>
+                <th>Output</th>
+                <th>Errors</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +32,15 @@ else
                     <td>@deviceStatus.device.Name</td>
                     <td>@deviceStatus.device.Hostname</td>
                     <td>@deviceStatus.status</td>
+                    <td style="padding-left: 20px">
+                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Warnings  ", string.Join(Environment.NewLine + Environment.NewLine, deviceStatus.warnings))))"></button>
+                    </td>
+                    <td style="padding-left: 20px">
+                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Output", deviceStatus.standardOutput)))"></button>
+                    </td>
+                    <td style="padding-left: 20px">
+                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Errors", deviceStatus.standardError)))"></button>
+                    </td>
                </tr>
             }
         </tbody>
@@ -39,4 +51,16 @@ else
 
     [Parameter]
     public List<DeviceStatus> DeviceStatuses { get; set; }
+
+    [Parameter]
+    public EventCallback<LongTextDetails> ShowWindow { get; set; }
+
+    public LongTextDetails CreateWindow(string title, string content)
+    {
+        LongTextDetails window = new();
+        window.HeaderContent = title;
+        window.BodyContent = content;
+
+        return window;
+    }
 }
