@@ -31,7 +31,7 @@ else
                <tr>
                     <td>@deviceStatus.device.Name</td>
                     <td>@deviceStatus.device.Hostname</td>
-                    <td>@deviceStatus.status</td>
+                    <td>@deviceStatus.statusMessage</td>
                     <td style="padding-left: 20px">
                         <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Warnings  ", string.Join(Environment.NewLine + Environment.NewLine, deviceStatus.warnings))))"></button>
                     </td>

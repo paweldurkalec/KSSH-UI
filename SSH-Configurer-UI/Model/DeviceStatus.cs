@@ -6,7 +6,9 @@ namespace SSH_Configurer_UI.Model
     {
         public Device device;
 
-        public string status;
+        public string statusMessage;
+
+        public ConfigurationStatuses status = ConfigurationStatuses.INITIALIZED;
 
         public List<string> warnings;
 
@@ -17,7 +19,7 @@ namespace SSH_Configurer_UI.Model
         public DeviceStatus(Device device)
         {
             this.device = device;
-            status = "Unknown";
+            statusMessage = "Unknown";
             standardOutput = "";
             standardError = "";
             warnings = new();
