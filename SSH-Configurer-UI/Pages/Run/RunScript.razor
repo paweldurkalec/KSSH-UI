@@ -6,6 +6,7 @@
 @inject IContentService<Group> groupService
 @inject IContentService<Device> deviceService
 @inject IContentService<Script> scriptService
+@inject IAuthenticationService authService
 @inject IConfiguration configuration
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
@@ -13,74 +14,80 @@
 @using System.Text
 @using Newtonsoft.Json
 
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 
-<EditForm Model="@configurationProcess" OnValidSubmit="@CheckConnection">
-    <DataAnnotationsValidator />
+@if(pageStatus == pageOK){
+    <EditForm Model="@configurationProcess" OnValidSubmit="@CheckConnection">
+        <DataAnnotationsValidator />
 
-    <div>Group of devices:</div>
-    <ValidationMessage For="(() => configurationProcess.GroupId)" />
-    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId" onchange="@HandleGroupSelection()">
-        @if (allGroups.Count > 0)
-        {
-            <option value=-1></option>
-            @foreach (var group in allGroups)
+        <div>Group of devices:</div>
+        <ValidationMessage For="(() => configurationProcess.GroupId)" />
+        <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.GroupId" onchange="@HandleGroupSelection()">
+            @if (allGroups.Count > 0)
             {
-                <option value=@group.Id>@group.Name</option>
+                <option value=-1></option>
+                @foreach (var group in allGroups)
+                {
+                    <option value=@group.Id>@group.Name</option>
+                }
             }
-        }
-        else
-        {
-            <option value=-1>No groups found!</option>
-        }
-    </InputSelect><br />
-
-    <div>Script to run:</div>
-    <ValidationMessage For="(() => configurationProcess.ScriptId)" />
-    <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.ScriptId">
-        @if (allScripts.Count > 0)
-        {
-            <option value=-1></option>
-            @foreach (var script in allScripts)
+            else
             {
-                <option value=@script.Id>@script.Name</option>
+                <option value=-1>No groups found!</option>
             }
-        }
-        else
-        {
-            <option value=-1>No scripts found!</option>
-        }
-    </InputSelect><br />
+        </InputSelect><br />
+
+        <div>Script to run:</div>
+        <ValidationMessage For="(() => configurationProcess.ScriptId)" />
+        <InputSelect class="form-control" TValue="int" @bind-Value="@configurationProcess.ScriptId">
+            @if (allScripts.Count > 0)
+            {
+                <option value=-1></option>
+                @foreach (var script in allScripts)
+                {
+                    <option value=@script.Id>@script.Name</option>
+                }
+            }
+            else
+            {
+                <option value=-1>No scripts found!</option>
+            }
+        </InputSelect><br />
 
 
 
-    <div style="color: @color">@feedback</div><br />
-    <button class="btn btn-primary" type="submit">Check connection</button>
-</EditForm>
-<br />
+        <div style="color: @color">@feedback</div><br />
+        <button class="btn btn-primary" type="submit">Check connection</button>
+    </EditForm>
+    <br />
 
-<br />
-<br />
-<DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses" ShowWindow="@ShowTextWindow"></DeviceStatusList>
-<br />
-<br />
-<div style="color: @runButtonFeedbackColor">@runButtonFeedback</div>
-<br />
-@if (isButtonDisabled)
-{
-    <button @onclick="RunButton" class="btn btn-primary" disabled>Run script</button>
+    <br />
+    <br />
+    <DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses" ShowWindow="@ShowTextWindow"></DeviceStatusList>
+    <br />
+    <br />
+    <div style="color: @runButtonFeedbackColor">@runButtonFeedback</div>
+    <br />
+    @if (isButtonDisabled)
+    {
+        <button @onclick="RunButton" class="btn btn-primary" disabled>Run script</button>
+    }
+    else
+    {
+        <button @onclick="RunButton" class="btn btn-primary">Run script</button>
+    }
+
+    <LongTextDetails @ref="textWindow"></LongTextDetails>
 }
-else
-{
-    <button @onclick="RunButton" class="btn btn-primary">Run script</button>
-}
-
-<LongTextDetails @ref="textWindow"></LongTextDetails>
 
 @code {
+    const string pageOK = "Run script on given group of devices";
+
     ConfigurationProcess configurationProcess;
     ClientWebSocket webSocket = new ClientWebSocket();
     List<Group> allGroups;
     List<Script> allScripts;
+    string pageStatus = "Loading...";
     int prevGroupChoice = -1;
     string feedback = "";
     string color = "";
@@ -108,10 +115,30 @@ else
     {
         if (firstRender)
         {
-            await webSocket.ConnectAsync(new Uri($"{configuration["BACKEND_WS"]}/"), CancellationToken.None);
-            _ = ReceiveLoop();
-            allGroups = (await groupService.GetAll()).ToList();
-            allScripts = (await scriptService.GetAll()).ToList();
+            string token;
+
+            token = await authService.GetJwtAsync();
+            if(token == null)
+            {
+                pageStatus = "You are not logged in.";
+                StateHasChanged();
+                return;
+            }
+
+            try
+            {
+                await webSocket.ConnectAsync(new Uri($"{configuration["BACKEND_WS"]}/{token}/"), CancellationToken.None);
+                _ = ReceiveLoop();
+                allGroups = (await groupService.GetAll()).ToList();
+                allScripts = (await scriptService.GetAll()).ToList();
+            }
+            catch (Exception e)
+            {
+                pageStatus = $"Error occurred when connecting to application backend.\n{e.Message}";
+                StateHasChanged();
+                return;
+            }
+            pageStatus = pageOK;
             StateHasChanged();
         }
     }
@@ -131,7 +158,7 @@ else
 
             foreach (var ds in configurationProcess.deviceStatuses)
             {
-                ds.status = "During configuration";
+                ds.statusMessage = "During configuration";
             }
 
             await Run();
@@ -195,16 +222,30 @@ else
             if(asyncResponse.message.request_uuid == configurationProcess.request_uuid)
             {
                 DeviceStatus deviceStatus = configurationProcess.deviceStatuses.Where(ds => ds.device.Id == asyncResponse.message.device).First();
-                deviceStatus.status = asyncResponse.message.status;
+                deviceStatus.statusMessage = asyncResponse.message.status;
                 deviceStatus.standardOutput = asyncResponse.message.result_std;
                 deviceStatus.standardError = asyncResponse.message.result_err;
                 if (configurationProcess.status == ConfigurationStatuses.RUNNING)
                 {
-                    if (configurationProcess.AllValid())
+                    deviceStatus.status = ConfigurationStatuses.FINISHED;
+                    if (configurationProcess.AllFinished())
                     {
                         configurationProcess.status = ConfigurationStatuses.FINISHED;
-                        runButtonFeedback = "Process finished";
-                        runButtonFeedbackColor = "green";
+                        isButtonDisabled = false;
+                        if (configurationProcess.AllValid())
+                        {
+                            runButtonFeedback = "Process finished successfully.";
+                            runButtonFeedbackColor = "green";
+                        }
+                        else if (configurationProcess.AllUnvalid()){
+                            runButtonFeedback = "Process finished unsuccessfully.";
+                            runButtonFeedbackColor = "red";
+                        }
+                        else
+                        {
+                            runButtonFeedback = "Process finished partially successfully.";
+                            runButtonFeedbackColor = "orange";
+                        }
                     }
                 }
                 await InvokeAsync(() =>
@@ -229,5 +270,10 @@ else
         runButtonFeedback = "";
         runButtonFeedbackColor = "";
         isButtonDisabled = false;
+    }
+
+    private string getTopInfo()
+    {
+        return pageStatus;
     }
 }

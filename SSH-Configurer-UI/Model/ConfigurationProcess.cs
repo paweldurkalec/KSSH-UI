@@ -1,6 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using SSH_Configurer_UI.Pages.List;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SSH_Configurer_UI.Model
 {
@@ -29,9 +31,21 @@ namespace SSH_Configurer_UI.Model
             deviceStatuses = new();
         }
 
+       
+
+        public bool AllFinished()
+        {
+            return deviceStatuses.Where(ds => ds.status != ConfigurationStatuses.FINISHED).IsNullOrEmpty();
+        }
+
         public bool AllValid()
         {
-            return deviceStatuses.Where(ds => ds.status != "Ok").IsNullOrEmpty();
+            return deviceStatuses.Where(ds => ds.statusMessage != "Ok").IsNullOrEmpty();
+        }
+
+        public bool AllUnvalid()
+        {
+            return deviceStatuses.Where(ds => ds.statusMessage != "Error while running script").IsNullOrEmpty();
         }
 
         public void SetDevices(IEnumerable<Device> devices)
