@@ -76,7 +76,7 @@ else
         {
             group = await groupService.GetById(int.Parse(groupId));
             devices.ForEach(device => device.IsSelected = false);
-            feedback = "Group added successfully.";
+            feedback = "Group updated successfully.";
             color = "green";
         }
         else

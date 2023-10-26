@@ -1,11 +1,15 @@
 ﻿@page "/"
 @using SSH_Configurer_UI.Model.DTOs.Authentication
 @inject IAuthenticationService AuthenticationService;
-
-
-<p class="error">Hello</p>
+@inject NavigationManager navManager;
 
 
 @code {
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            navManager.NavigateTo("/authentication");
+        }
+    }
 }

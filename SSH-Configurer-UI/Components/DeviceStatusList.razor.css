@@ -1,7 +1,6 @@
 ﻿.table {
     width: 1000px;
     table-layout: fixed;
-    border-collapse: collapse;
 }
 
     .table tbody {
@@ -16,8 +15,11 @@
     }
 
     .table thead {
-        background-color: #0055ff;
+        display: block;
+        background-image: linear-gradient(90deg, #001f66 0%, #3366cc 50%, #66a3ff 70%);
         color: #fff;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
     }
 
     .table th,

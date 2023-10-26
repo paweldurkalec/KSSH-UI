@@ -31,14 +31,21 @@ namespace SSH_Configurer_UI.Services
 
         public async Task<bool> CheckIfUserExists()
         {
-            var response = await _httpClient.GetFromJsonAsync<UserExistsResponse>("user_exists").ConfigureAwait(false);
+            try
+            {
+                var response = await _httpClient.GetFromJsonAsync<UserExistsResponse>("user_exists").ConfigureAwait(false);
 
-            if (response is null)
+                if (response is null)
+                {
+                    return false;
+                }
+
+                return response.exists;
+            }
+            catch(Exception e)
             {
                 return false;
             }
-
-            return response.exists;
         }
 
         private bool shouldRefresh()

@@ -22,8 +22,7 @@ else
                 <tr>
                     <th>Id</th>
                     <th>Name</th>
-                    <th>Assigned Public Key</th>
-                    <th>Number of devices</th>
+                    <th>Assigned Key Id</th>
                     <th>Update</th>
                     <th>Remove</th>
                 </tr>
@@ -35,7 +34,6 @@ else
                         <td>@group.Id</td>
                         <td>@group.Name</td>
                         <td>@group.KeyPairId</td>
-                        <td>@deviceCounts.GetValueOrDefault(group, 0)</td>
                         <td style="padding-left: 20px">
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentGroup.InvokeAsync(group.Id)"></button>
                         </td>

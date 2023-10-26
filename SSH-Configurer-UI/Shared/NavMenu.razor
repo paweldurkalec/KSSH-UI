@@ -1,9 +1,9 @@
 ﻿@using SSH_Configurer_UI.Model;
-
+@inject IAuthenticationService authService;
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">SSH-Configurer-UI</a>
+        <a class="navbar-brand" href="">SSH Configurer</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -20,43 +20,68 @@
 </div>
 
 @code {
-    List<NavMenuItem> navItemsToDisplay = new List<NavMenuItem>()
+    static List<NavMenuItem> navItemsNotLoggedIn = new List<NavMenuItem>()
     {
-        new NavMenuItem("Run script", "run-script", 0, "oi oi-target", "oi oi-target", new List<NavMenuItem>()),
-        new NavMenuItem("Authentication", "authentication", 0, "oi oi-person", "oi oi-person", new List<NavMenuItem>()),
-        new NavMenuItem("Groups", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
-                    new List<NavMenuItem>()
-                    {
-                        new NavMenuItem("Show groups", "groups", 1, "oi oi-grid-four-up", "oi oi-grid-four-up", new List<NavMenuItem>()),
-                        new NavMenuItem("Add group", "add-group", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
-                    }
-        ),
-        new NavMenuItem("Devices", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
-                    new List<NavMenuItem>()
-                    {
-                        new NavMenuItem("Show devices", "devices", 1, "oi oi-monitor", "oi oi-monitor", new List<NavMenuItem>()),
-                        new NavMenuItem("Add device", "add-device", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
-                    }
-        ),
-        new NavMenuItem("Scripts", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
-                    new List<NavMenuItem>()
-                    {
-                        new NavMenuItem("Show scripts", "scripts", 1, "oi oi-script", "oi oi-script", new List<NavMenuItem>()),
-                        new NavMenuItem("Add script", "add-script", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
-                    }
-        ),
-        new NavMenuItem("Keys", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
-                    new List<NavMenuItem>()
-                    {
-                        new NavMenuItem("Show keys", "keyPairs", 1, "oi oi-key", "oi oi-key", new List<NavMenuItem>()),
-                        new NavMenuItem("Add key pair", "add-keyPair", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
-                    }
-        )
+        new NavMenuItem("Authentication", "authentication", 0, "oi oi-person", "oi oi-person", new List<NavMenuItem>())
     };
+
+    static List<NavMenuItem> navItemsLoggedIn = new List<NavMenuItem>()
+        {
+            new NavMenuItem("Run script", "run-script", 0, "oi oi-target", "oi oi-target", new List<NavMenuItem>()),
+            new NavMenuItem("Authentication", "authentication", 0, "oi oi-person", "oi oi-person", new List<NavMenuItem>()),
+            new NavMenuItem("Groups", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                        new List<NavMenuItem>()
+                        {
+                            new NavMenuItem("Show groups", "groups", 1, "oi oi-grid-four-up", "oi oi-grid-four-up", new List<NavMenuItem>()),
+                            new NavMenuItem("Add group", "add-group", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        }
+            ),
+            new NavMenuItem("Devices", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                        new List<NavMenuItem>()
+                        {
+                            new NavMenuItem("Show devices", "devices", 1, "oi oi-monitor", "oi oi-monitor", new List<NavMenuItem>()),
+                            new NavMenuItem("Add device", "add-device", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        }
+            ),
+            new NavMenuItem("Scripts", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                        new List<NavMenuItem>()
+                        {
+                            new NavMenuItem("Show scripts", "scripts", 1, "oi oi-script", "oi oi-script", new List<NavMenuItem>()),
+                            new NavMenuItem("Add script", "add-script", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        }
+            ),
+            new NavMenuItem("Keys", "none", 0, "oi oi-caret-bottom", "oi oi-caret-right",
+                        new List<NavMenuItem>()
+                        {
+                            new NavMenuItem("Show keys", "keyPairs", 1, "oi oi-key", "oi oi-key", new List<NavMenuItem>()),
+                            new NavMenuItem("Add key pair", "add-keyPair", 1, "oi oi-plus", "oi oi-plus", new List<NavMenuItem>())
+                        }
+            )
+        };
+
+    List<NavMenuItem> navItemsToDisplay = navItemsNotLoggedIn;
 
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    public void ShowMenu()
+    {
+        navItemsToDisplay = navItemsLoggedIn;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (true)
+        {
+            string token;
+
+            token = await authService.GetJwtAsync();
+            //((AuthenticationService)authService).ShowMenu = ShowMenu;
+            navItemsToDisplay = token == null ? navItemsNotLoggedIn : navItemsLoggedIn;
+            StateHasChanged();
+        }
+    }
 
     private void ToggleNavMenu()
     {

@@ -23,8 +23,7 @@ else{
                     <th>Hostname</th>
                     <th>Port</th>
                     <th>Username</th>
-                    <th>Key Pair Id</th>
-                    <th>Password</th>
+                    <th>Assigned Key Id</th>
                     <th>Update</th>
                     <th>Remove</th>
                 </tr>
@@ -39,7 +38,6 @@ else{
                         <td>@device.Port</td>
                         <td>@device.Username</td>
                         <td>@device.KeyPairId</td>
-                        <td>@device.Password</td>
                         <td style="padding-left: 20px">
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentDevice.InvokeAsync(device.Id)"></button>
                         </td>
