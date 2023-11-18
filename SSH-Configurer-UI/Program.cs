@@ -31,6 +31,7 @@ namespace SSH_Configurer_UI
             builder.Services.AddBlazoredSessionStorage();
 
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddScoped<IStateService, StateService>();
             builder.Services.AddScoped<IContentService<Device>, DeviceService>(provider =>
             {
                 var httpClient = new HttpClient(new AuthenticationHandler(provider.GetService<IAuthenticationService>(), provider.GetService<IConfiguration>()))

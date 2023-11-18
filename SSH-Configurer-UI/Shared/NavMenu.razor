@@ -1,4 +1,5 @@
 ﻿@using SSH_Configurer_UI.Model;
+@inject IStateService stateService;
 @inject IAuthenticationService authService;
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -70,17 +71,43 @@
         navItemsToDisplay = navItemsLoggedIn;
     }
 
+    private async Task<bool> CheckLogin()
+    {
+        string jwt = await authService.GetJwtAsync();
+
+        return jwt != null;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (true)
+        if (firstRender)
         {
-            string token;
+            bool loggedIn = await CheckLogin();
 
-            token = await authService.GetJwtAsync();
-            //((AuthenticationService)authService).ShowMenu = ShowMenu;
-            navItemsToDisplay = token == null ? navItemsNotLoggedIn : navItemsLoggedIn;
-            StateHasChanged();
+            if (loggedIn)
+            {
+                navItemsToDisplay = navItemsLoggedIn;
+                StateHasChanged();
+            }
+
+            ((StateService)stateService).OnLogin += OnLogIn;
         }
+    }
+
+    public async void OnLogIn()
+    {
+        if (navItemsToDisplay == navItemsNotLoggedIn)
+        {
+            navItemsToDisplay = navItemsLoggedIn;
+        }
+        else
+        {
+            navItemsToDisplay = navItemsNotLoggedIn;
+        }
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
     }
 
     private void ToggleNavMenu()
