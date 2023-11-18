@@ -1,0 +1,20 @@
+﻿@page "/logout"
+@inject IAuthenticationService AuthenticationService;
+@inject NavigationManager navManager;
+
+<InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
+
+<button class="btn btn-primary" onclick="@TriggerLogout">Logout</button>
+
+@code {
+    private string getTopInfo()
+    {
+        return $"Logout.";
+    }
+
+    async void TriggerLogout()
+    {
+        await AuthenticationService.LogoutAsync();
+        navManager.NavigateTo("/login");
+    }
+}

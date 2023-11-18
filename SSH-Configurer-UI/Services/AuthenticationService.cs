@@ -26,8 +26,7 @@ namespace SSH_Configurer_UI.Services
         private string? _jwtCache;
         private string? _jwtRefreshCache;
         private readonly IConfiguration _configuration;
-
-        public event Action<string?>? LoginChange;
+        private readonly IStateService _stateService;
 
         public async Task<bool> CheckIfUserExists()
         {
@@ -80,7 +79,7 @@ namespace SSH_Configurer_UI.Services
             _accessRefresh = DateTime.Now;
         }
 
-        public AuthenticationService(ISessionStorageService sessionStorageService, IConfiguration configuration)
+        public AuthenticationService(ISessionStorageService sessionStorageService, IConfiguration configuration, IStateService stateService)
         {
             _configuration = configuration;
             var httpClient = new HttpClient
@@ -89,6 +88,7 @@ namespace SSH_Configurer_UI.Services
             };
             _httpClient = httpClient;
             _sessionStorageService = sessionStorageService;
+            _stateService = stateService;
         }
 
         public async ValueTask<string> GetJwtRefreshAsync()
@@ -122,10 +122,12 @@ namespace SSH_Configurer_UI.Services
         public async Task LogoutAsync()
         {
             await _sessionStorageService.RemoveItemAsync(JWT_KEY).ConfigureAwait(false);
+            await _sessionStorageService.RemoveItemAsync(JWT_REFRESH_KEY).ConfigureAwait(false);
 
             _jwtCache = null;
+            _jwtRefreshCache = null;
 
-            LoginChange?.Invoke(null);
+            ((StateService)_stateService).OnLogin?.Invoke();
         }
 
         public async Task<int> RegisterAsync(RegisterModel credentials)
@@ -168,8 +170,7 @@ namespace SSH_Configurer_UI.Services
             _jwtCache = null;
             _jwtRefreshCache = null;
             _accessRefresh = DateTime.Now;
-
-            LoginChange?.Invoke(GetUsername(content.access));
+            ((StateService)_stateService).OnLogin?.Invoke();
 
             return 0;
         }

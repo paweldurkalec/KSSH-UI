@@ -4,15 +4,28 @@
 
 @code {
     private bool isRegistered = true;
+    private bool isLogged = true;
 
     private async Task CheckRegistrationStatus()
     {
         isRegistered = await authService.CheckIfUserExists();
     }
 
+    private async Task CheckLogin()
+    {
+        string jwt = await authService.GetJwtAsync();
+
+        isLogged = jwt != null;    
+    }
+
     private void RedirectToLogin()
     {
         navManager.NavigateTo("/login");
+    }
+
+    private void RedirectToLogout()
+    {
+        navManager.NavigateTo("/logout");
     }
 
     private void RedirectToRegister()
@@ -23,10 +36,19 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await CheckRegistrationStatus();
+        await CheckLogin();
 
         if (isRegistered)
         {
-            RedirectToLogin();
+            if (isLogged)
+            {
+                RedirectToLogout();
+            }
+            else
+            {
+                RedirectToLogin();
+            }
+            
         }
         else
         {
