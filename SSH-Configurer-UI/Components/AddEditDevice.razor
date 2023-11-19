@@ -39,8 +39,13 @@
         }
     </InputSelect><br />
 
-    <div>Password (optional):</div>
-    <InputText class="form-control" placeholder="Password" @bind-Value="@device.Password" type="password"></InputText><br />
+    <label for="isChecked">Include password:</label>
+    <InputCheckbox id="isChecked" @bind-Value="setPassword" />
+
+    <fieldset disabled="@(setPassword == false)">
+        <InputText class="form-control" placeholder="@passwordPlaceholder" @bind-Value="@device.Password" type="password"></InputText>
+        <br />
+    </fieldset>
 
     <div style="color: @color">@feedback</div><br />
     <button onclick="@Reset" class="btn btn-primary" type="submit">Save device</button>
@@ -64,6 +69,26 @@
 
     [Parameter]
     public string feedback { get; set; }
+
+    [Parameter]
+    public string passwordPlaceholder { get; set; }
+
+    private bool _value;
+
+    [Parameter]
+    public bool setPassword
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            setPasswordChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<bool> setPasswordChanged { get; set; }
 
     private void Save()
     {

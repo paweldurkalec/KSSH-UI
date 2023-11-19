@@ -53,7 +53,7 @@ namespace SSH_Configurer_UI.Model
         //[RequiredIf("Password", "", "ServerPubKeyId is required when Password is empty.")]
         public int KeyPairId { get; set; } = -1;
         //[RequiredIf("ServerPubKeyId", -1, "Password is required when ServerPubKeyId is -1.")]
-        public string Password { get; set; } = "";
+        public string? Password { get; set; } = "";
         public Device() { }
         public Device(int id, string name, string hostname, int port, string username, int keyPairId, string password)
         {

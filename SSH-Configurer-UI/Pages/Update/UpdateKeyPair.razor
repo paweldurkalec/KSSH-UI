@@ -13,7 +13,7 @@
 else
 {
     <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
-    <AddEditKeyPair keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></AddEditKeyPair>
+    <EditKeyPair keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></EditKeyPair>
 }
 
 @code {
@@ -39,6 +39,10 @@ else
             {
                 stateMessage = "KeyPair not found!";
                 stateColor = "red";
+            }
+            else
+            {
+                keyPair.PrivateKey = "placeholder";
             }
             StateHasChanged();
         }

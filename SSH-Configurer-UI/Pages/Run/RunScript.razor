@@ -178,7 +178,8 @@
         if (uuid != null)
         {
             configurationProcess.request_uuid = uuid;
-            configurationProcess.status = ConfigurationStatuses.RUNNING;
+            configurationProcess.Running();
+
         }
     }
 
@@ -190,6 +191,7 @@
         string? uuid = await gs.CheckConnection(configurationProcess.GroupId);
         if(uuid != null)
         {
+            configurationProcess.CheckingConnection();
             configurationProcess.request_uuid = uuid;
         }
     }
@@ -225,6 +227,7 @@
                 deviceStatus.statusMessage = asyncResponse.message.status;
                 deviceStatus.standardOutput = asyncResponse.message.result_std;
                 deviceStatus.standardError = asyncResponse.message.result_err;
+                deviceStatus.warnings = asyncResponse.message.warnings;
                 if (configurationProcess.status == ConfigurationStatuses.RUNNING)
                 {
                     deviceStatus.status = ConfigurationStatuses.FINISHED;

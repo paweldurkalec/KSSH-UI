@@ -2,6 +2,7 @@
 using SSH_Configurer_UI.Model.DTOs.Device;
 using SSH_Configurer_UI.Pages.List;
 using SSH_Configurer_UI.Services.Interfaces;
+using System.Data;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -45,10 +46,18 @@ namespace SSH_Configurer_UI.Services
         {
             try
             {
-                string serialized = JsonSerializer.Serialize(new DeviceDTO(device));
+                string serialized;
+                if (device.Id == 1)
+                {
+                    serialized = JsonSerializer.Serialize(new DeviceDTO(device));
+                }
+                else
+                {
+                    serialized = JsonSerializer.Serialize(new DeviceDTONoPass(device));
+                }
                 var bytes = MyUtils.ConvertToBytes(serialized);
 
-                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+                var response = await httpClient.PatchAsync($"{id}/", bytes).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -88,7 +97,16 @@ namespace SSH_Configurer_UI.Services
 
                 if (dto != null)
                 {
-                    return new Device(dto);
+                    var dev = new Device(dto);
+                    if (!dto.is_password_set)
+                    {
+                        dev.Password = "no_password";
+                    }
+                    else
+                    {
+                        dev.Password = "password";
+                    }
+                    return dev;
                 }
                 else
                 {

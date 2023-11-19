@@ -3,13 +3,14 @@
 @inject IContentService<KeyPair> keyService
 
 <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
-<AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
+<AddEditDevice @bind-setPassword="setPassword" passwordPlaceholder="Provide new password" device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
 
 @code {
     private Device device;
     List<KeyPair> keys;
     string feedback = "";
     string color = "";
+    bool setPassword = false;
 
     protected override void OnInitialized()
     {
@@ -30,7 +31,10 @@
 
     private async Task SaveDevice()
     {
-        int response = (await deviceService.Add(new Device
+        int response;
+        if (setPassword)
+        {
+            response = (await deviceService.Add(new Device
             {
                 Name = device.Name,
                 Hostname = device.Hostname,
@@ -39,6 +43,19 @@
                 KeyPairId = device.KeyPairId,
                 Password = device.Password
             }));
+        }
+        else
+        {
+            response = (await deviceService.Add(new Device
+                {
+                    Name = device.Name,
+                    Hostname = device.Hostname,
+                    Port = device.Port,
+                    Username = device.Username,
+                    KeyPairId = device.KeyPairId,
+                    Password = ""
+                }));
+        }
         if(response == 0)
         {
             device = new Device();

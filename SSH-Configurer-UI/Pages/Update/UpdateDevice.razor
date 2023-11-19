@@ -14,7 +14,7 @@
 else
 {
     <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
-    <AddEditDevice device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
+    <AddEditDevice @bind-setPassword="setPassword" passwordPlaceholder=@passwordPlaceholder device="@device" resetFeedback="@ResetFeedback" saveDevice="@SaveDevice" keys="@keys" color="@color" feedback="@feedback"></AddEditDevice>
 }
 
 @code {
@@ -26,6 +26,21 @@ else
     string color = "";
     string stateMessage = "Loading...";
     string stateColor = "green";
+    bool hasPassword;
+    bool setPasswordField = false;
+    public bool setPassword
+    {
+        get
+        {
+            return setPasswordField;
+        }
+        set
+        {
+            setPasswordField = value;
+            UpdatePasswordHint();
+        }
+    }
+    public string passwordPlaceholder {get; set;} 
 
     protected override void OnInitialized()
     {
@@ -43,33 +58,89 @@ else
                 stateMessage = "Device not found!";
                 stateColor = "red";
             }
+            else
+            {
+                HandlePassword();
+            }
             StateHasChanged();
         }
     }
 
+
+    void UpdatePasswordHint()
+    {
+        if (hasPassword && setPasswordField == false)
+        {
+            passwordPlaceholder = "Existing password will be removed";
+        }
+        else if (hasPassword && setPasswordField == true)
+        {
+            passwordPlaceholder = "Password is set, type to override";
+        }
+    }
+
+    private void HandlePassword()
+    {
+        if (device.Password == "no_password")
+        {
+            setPassword = false;
+            hasPassword = false;
+            passwordPlaceholder = "Provide new password";
+        }
+        else
+        {
+            setPassword = true;
+            hasPassword = true;
+            passwordPlaceholder = "Password is set, type to override";
+        }
+        device.Password = null;
+    }
+
     private async Task SaveDevice()
     {
+        int id;
+        string? password;
+        var a = device.Password;
+        if (!setPassword)
+        {
+            id = 1;
+            password = null;
+        }
+        else if (setPassword && device.Password == null)
+        {
+            id = 0;
+            password = null;
+        }
+        else
+        {
+            id = 1;
+            password = device.Password;
+        }
         int response = await deviceService.Update(int.Parse(deviceId), new Device
             {
-                Id = device.Id,
+                // id used just to pass info about setPassword
+                Id = id,
                 Name = device.Name,
                 Hostname = device.Hostname,
                 Port = device.Port,
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
-                Password = device.Password
+                Password = password
             });
+
         if (response == 0)
         {
             device = await deviceService.GetById(int.Parse(deviceId));
             feedback = "Device updated successfully.";
             color = "green";
+            HandlePassword();
         }
         else
         {
             feedback = "Updating failed.";
             color = "red";
         }
+        StateHasChanged();
     }
 
     private void ResetFeedback()

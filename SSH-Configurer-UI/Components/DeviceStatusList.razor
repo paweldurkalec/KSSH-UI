@@ -32,15 +32,47 @@ else
                     <td>@deviceStatus.device.Name</td>
                     <td>@deviceStatus.device.Hostname</td>
                     <td>@deviceStatus.statusMessage</td>
+
+
+                    @if (deviceStatus.warnings is not null && deviceStatus.warnings.Count > 0)
+                    {
                     <td style="padding-left: 20px">
-                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Warnings  ", string.Join(Environment.NewLine + Environment.NewLine, deviceStatus.warnings))))"></button>
+                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Warnings  ", string.Join(Environment.NewLine, deviceStatus.warnings))))"></button>
                     </td>
+                    }
+                    else
+                    {
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-ban"></button>
+                        </td>
+                    }
+
+                    @if (deviceStatus.standardOutput != "" && deviceStatus.standardOutput is not null)
+                    {
                     <td style="padding-left: 20px">
                         <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Output", deviceStatus.standardOutput)))"></button>
                     </td>
-                    <td style="padding-left: 20px">
-                        <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Errors", deviceStatus.standardError)))"></button>
-                    </td>
+                    }
+                    else
+                    {
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-ban"></button>
+                        </td>
+                    }
+
+                    @if (deviceStatus.standardError != "" && deviceStatus.standardError is not null)
+                    {
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-eye" @onclick="@(()=>ShowWindow.InvokeAsync(CreateWindow("Errors", deviceStatus.standardError)))"></button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="padding-left: 20px">
+                            <button class="oi oi-ban"></button>
+                        </td>
+                    }
+                    
                </tr>
             }
         </tbody>
