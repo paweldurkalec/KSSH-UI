@@ -86,8 +86,7 @@
 
             if (loggedIn)
             {
-                navItemsToDisplay = navItemsLoggedIn;
-                StateHasChanged();
+                OnLogIn();
             }
 
             ((StateService)stateService).OnLogin += OnLogIn;
@@ -98,10 +97,20 @@
     {
         if (navItemsToDisplay == navItemsNotLoggedIn)
         {
+            navItemsToDisplay = new();
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
             navItemsToDisplay = navItemsLoggedIn;
         }
         else
         {
+            navItemsToDisplay = new();
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
             navItemsToDisplay = navItemsNotLoggedIn;
         }
         await InvokeAsync(() =>

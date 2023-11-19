@@ -1,7 +1,6 @@
 ﻿@page "/logout"
 @inject IAuthenticationService AuthenticationService;
 @inject NavigationManager navManager;
-
 <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
 
 <button class="btn btn-primary" onclick="@TriggerLogout">Logout</button>

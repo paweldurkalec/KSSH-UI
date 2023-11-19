@@ -43,10 +43,11 @@ namespace SSH_Configurer_UI.Services
         {
             try
             {
-                string serialized = JsonSerializer.Serialize(new KeyPairDTO(keyPair));
+                var obj = new { name = keyPair.Name };
+                string serialized = JsonSerializer.Serialize(obj);
                 var bytes = MyUtils.ConvertToBytes(serialized);
 
-                var response = await httpClient.PutAsync($"{id}/", bytes).ConfigureAwait(false);
+                var response = await httpClient.PatchAsync($"{id}/", bytes).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

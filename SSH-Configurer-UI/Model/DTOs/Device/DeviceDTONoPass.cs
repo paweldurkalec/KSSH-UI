@@ -1,13 +1,7 @@
-﻿using Foolproof;
-using System.ComponentModel.DataAnnotations;
-using SSH_Configurer_UI.Model;
-
-namespace SSH_Configurer_UI.Model.DTOs.Device
+﻿namespace SSH_Configurer_UI.Model.DTOs.Device
 {
-    public class DeviceDTOId
+    public class DeviceDTONoPass
     {
-        public int id { get; set; }
-
         public string name { get; set; }
 
         public string hostname { get; set; }
@@ -18,18 +12,15 @@ namespace SSH_Configurer_UI.Model.DTOs.Device
 
         public int? key_pair { get; set; }
 
-        public bool is_password_set { get; set; }
+        public DeviceDTONoPass() { }
 
-        public DeviceDTOId() { }
-
-        public DeviceDTOId(Model.Device device)
+        public DeviceDTONoPass(Model.Device device)
         {
-            id = device.Id;
             name = device.Name;
             hostname = device.Hostname;
             port = device.Port;
             username = device.Username;
             key_pair = device.KeyPairId > 0 ? device.KeyPairId : null;
         }
-    }
+}
 }

@@ -31,9 +31,24 @@ namespace SSH_Configurer_UI.Model
             deviceStatuses = new();
         }
 
-       
+        public void Running()
+        {
+            status = ConfigurationStatuses.RUNNING;
 
-        public bool AllFinished()
+        }
+
+        public void CheckingConnection()
+        {
+
+            foreach (var deviceStatus in deviceStatuses)
+            {
+                deviceStatus.statusMessage = "Checking";
+            }
+
+        }
+
+
+    public bool AllFinished()
         {
             return deviceStatuses.Where(ds => ds.status != ConfigurationStatuses.FINISHED).IsNullOrEmpty();
         }
