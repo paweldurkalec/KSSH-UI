@@ -37,7 +37,6 @@ namespace SSH_Configurer_UI.Model
             {
                 deviceStatus.status = ConfigurationStatuses.RUNNING;
             }
-
         }
 
         public void CheckingConnection()
