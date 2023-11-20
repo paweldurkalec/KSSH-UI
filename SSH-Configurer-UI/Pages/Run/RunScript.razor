@@ -61,6 +61,8 @@
     </EditForm>
     <br />
 
+
+    @if(configurationProcess.deviceStatuses.Count>0){
     <br />
     <br />
     <DeviceStatusList DeviceStatuses="@configurationProcess.deviceStatuses" ShowWindow="@ShowTextWindow"></DeviceStatusList>
@@ -78,6 +80,7 @@
     }
 
     <LongTextDetails @ref="textWindow"></LongTextDetails>
+    }
 }
 
 @code {
@@ -150,7 +153,7 @@
             runButtonFeedback = "No devices to configure.";
             runButtonFeedbackColor = "red";
         }
-        else if (configurationProcess.AllValid())
+        else if (configurationProcess.AllValid() && configurationProcess.ScriptId != -1)
         {
             runButtonFeedback = "Process initialized, please wait...";
             runButtonFeedbackColor = "black";
@@ -163,8 +166,12 @@
 
             await Run();
         }
-        else
+        else if (configurationProcess.ScriptId == -1)
         {
+            runButtonFeedback = "Choose script.";
+            runButtonFeedbackColor = "red";
+        }
+        else{
             runButtonFeedback = "Not all connections are valid.";
             runButtonFeedbackColor = "red";
         }
