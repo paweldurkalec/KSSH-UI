@@ -23,7 +23,6 @@ namespace SSH_Configurer_UI.Model
 
         [Range(1, int.MaxValue, ErrorMessage = "Choose group.")]
         public int GroupId { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Choose script.")]
         public int ScriptId { get; set; }
         public List<DeviceStatus> deviceStatuses { get; set; }
         public ConfigurationProcess() 
@@ -34,7 +33,10 @@ namespace SSH_Configurer_UI.Model
         public void Running()
         {
             status = ConfigurationStatuses.RUNNING;
-
+            foreach (var deviceStatus in deviceStatuses)
+            {
+                deviceStatus.status = ConfigurationStatuses.RUNNING;
+            }
         }
 
         public void CheckingConnection()
