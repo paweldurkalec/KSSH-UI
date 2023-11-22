@@ -2,7 +2,7 @@
 @inject IContentService<KeyPair> keyPairService
 
 <InfoTopDiv content="@getTopInfo()"></InfoTopDiv>
-<AddEditKeyPair keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></AddEditKeyPair>
+<AddKeyPairComp keyPair="@keyPair" resetFeedback="@ResetFeedback" saveKeyPair="@SaveKeyPair" color="@color" feedback="@feedback"></AddKeyPairComp>
 
 @code {
     private KeyPair keyPair;
