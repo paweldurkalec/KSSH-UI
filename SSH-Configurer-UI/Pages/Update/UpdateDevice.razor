@@ -100,7 +100,7 @@ else
     {
         int id;
         string? password;
-        var a = device.Password;
+        device.DevPubKey = device.DevPubKey == "" ? null : device.DevPubKey;
         if (!setPassword)
         {
             id = 1;
@@ -125,7 +125,8 @@ else
                 Port = device.Port,
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
-                Password = password
+                Password = password,
+                DevPubKey = device.DevPubKey
             });
 
         if (response == 0)

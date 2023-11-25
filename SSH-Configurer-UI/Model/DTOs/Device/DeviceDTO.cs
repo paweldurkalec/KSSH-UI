@@ -13,6 +13,8 @@
         public int? key_pair { get; set; }
 
         public string? password { get; set; }
+
+        public string? public_key { get; set; } = null;
         public DeviceDTO() { }
 
         public DeviceDTO(Model.Device device)
@@ -23,6 +25,7 @@
             username = device.Username;
             key_pair = device.KeyPairId > 0 ? device.KeyPairId : null;
             password = device.Password != "" ? device.Password : null;
+            public_key = device.DevPubKey;
         }
     }
 }

@@ -33,7 +33,14 @@ else
                     <tr>
                         <td>@group.Id</td>
                         <td>@group.Name</td>
-                        <td>@group.KeyPairId</td>
+                        @if (group.KeyPairId == -1)
+                        {
+                            <td>None</td>
+                        }
+                        else
+                        {
+                            <td>@group.KeyPairId</td>
+                        }
                         <td style="padding-left: 20px">
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentGroup.InvokeAsync(group.Id)"></button>
                         </td>

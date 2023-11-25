@@ -47,9 +47,20 @@
         <br />
     </fieldset>
 
+    <div>Device's public key:</div>
+    <ValidationMessage For="(() => device.DevPubKey)" />
+    <InputTextArea class="form-control custom-textarea" placeholder="Leave empty if unknown." @bind-Value="@device.DevPubKey"></InputTextArea><br />
+
     <div style="color: @color">@feedback</div><br />
     <button onclick="@Reset" class="btn btn-primary" type="submit">Save device</button>
 </EditForm>
+
+<style>
+    .custom-textarea {
+        height: 300px; /* Set the initial height */
+        resize: vertical;
+    }
+</style>
 
 @code {
     [Parameter]

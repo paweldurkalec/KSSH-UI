@@ -32,6 +32,7 @@
     private async Task SaveDevice()
     {
         int response;
+        device.DevPubKey = device.DevPubKey == "" ? null : device.DevPubKey;
         if (setPassword)
         {
             response = (await deviceService.Add(new Device
@@ -41,7 +42,8 @@
                 Port = device.Port,
                 Username = device.Username,
                 KeyPairId = device.KeyPairId,
-                Password = device.Password
+                Password = device.Password,
+                DevPubKey = device.DevPubKey
             }));
         }
         else
@@ -53,7 +55,8 @@
                     Port = device.Port,
                     Username = device.Username,
                     KeyPairId = device.KeyPairId,
-                    Password = ""
+                    Password = "",
+                    DevPubKey = device.DevPubKey
                 }));
         }
         if(response == 0)
