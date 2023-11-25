@@ -12,6 +12,8 @@
 
         public int? key_pair { get; set; }
 
+        public string? public_key { get; set; } = null;
+
         public DeviceDTONoPass() { }
 
         public DeviceDTONoPass(Model.Device device)
@@ -21,6 +23,7 @@
             port = device.Port;
             username = device.Username;
             key_pair = device.KeyPairId > 0 ? device.KeyPairId : null;
+            public_key = device.DevPubKey;
         }
 }
 }

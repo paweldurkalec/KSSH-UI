@@ -1,6 +1,8 @@
 ﻿using Foolproof;
 using SSH_Configurer_UI.Model.DTOs.Device;
+using SSH_Configurer_UI.Pages.List;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SSH_Configurer_UI.Model
 {
@@ -54,6 +56,7 @@ namespace SSH_Configurer_UI.Model
         public int KeyPairId { get; set; } = -1;
         //[RequiredIf("ServerPubKeyId", -1, "Password is required when ServerPubKeyId is -1.")]
         public string? Password { get; set; } = "";
+        public string? DevPubKey { get; set; } = null;
         public Device() { }
         public Device(int id, string name, string hostname, int port, string username, int keyPairId, string password)
         {
@@ -75,6 +78,15 @@ namespace SSH_Configurer_UI.Model
             Username = deviceDTO.username;
             KeyPairId = deviceDTO.key_pair ?? -1;
             Password = "";
+            DevPubKey = deviceDTO.public_key;
+            if (deviceDTO.is_password_set)
+            {
+                Password = "";
+            }
+            else
+            {
+                Password = "no_password";
+            }
         }
     }
 }

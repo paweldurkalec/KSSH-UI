@@ -24,6 +24,8 @@ else{
                     <th>Port</th>
                     <th>Username</th>
                     <th>Assigned Key Id</th>
+                    <th>Has Password</th>
+                    <th>Device's public key</th>
                     <th>Update</th>
                     <th>Remove</th>
                 </tr>
@@ -37,7 +39,27 @@ else{
                         <td>@device.Hostname</td>
                         <td>@device.Port</td>
                         <td>@device.Username</td>
-                        <td>@device.KeyPairId</td>
+                        @if(device.KeyPairId == -1)
+                        {
+                            <td>None</td>
+                        }
+                        else
+                        {
+                            <td>@device.KeyPairId</td>
+                        }
+                        <td>@device.Password</td>
+                        @if (device.DevPubKey == null)
+                        {
+                            <td>
+                                <button class="oi oi-ban"></button>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <button class="oi oi-eye" @onclick="()=>ShowPubKeyContent.InvokeAsync(device)"></button>
+                            </td>
+                        }
                         <td style="padding-left: 20px">
                             <button class="oi oi-wrench" @onclick="()=>UpdateCurrentDevice.InvokeAsync(device.Id)"></button>
                         </td>
@@ -58,6 +80,9 @@ else{
 
     [Parameter]
     public EventCallback<Device> DeleteCurrentDevice { get; set; }
+
+    [Parameter]
+    public EventCallback<Device> ShowPubKeyContent { get; set; }
 
     [Parameter]
     public EventCallback<int> UpdateCurrentDevice { get; set; }

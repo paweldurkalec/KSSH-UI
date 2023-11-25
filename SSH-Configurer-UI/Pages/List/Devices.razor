@@ -2,13 +2,16 @@
 @inject NavigationManager navManager;
 @inject IContentService<Device> deviceService;
 
-<DeviceList Devices="devices" DeleteCurrentDevice="RequestDeletion" UpdateCurrentDevice="UpdateDevice"></DeviceList>
+<DeviceList ShowPubKeyContent="ShowKeyContent" Devices="devices" DeleteCurrentDevice="RequestDeletion" UpdateCurrentDevice="UpdateDevice"></DeviceList>
 
 <Confirmation @ref="deleteConfirmation" OnConfirmed="@DeleteDevice"></Confirmation>
+
+<LongTextDetails @ref="devPubKeyContent"></LongTextDetails>
 
 @code {
     private List<Device> devices = new();
     private Confirmation deleteConfirmation;
+    private LongTextDetails devPubKeyContent;
 
     // protected override async Task OnInitializedAsync()
     // {
@@ -22,6 +25,19 @@
         if (firstRender)
         {
             devices = (await deviceService.GetAll()).ToList();
+
+            foreach(Device d in devices)
+            {
+                if(d.Password == "no_password")
+                {
+                    d.Password = "No";
+                }
+                else
+                {
+                    d.Password = "Yes";
+                }
+            }
+
             StateHasChanged();
         }
     }
@@ -33,6 +49,13 @@
                                           "This action can not be undone.";
         deleteConfirmation.actionItem = device;
         deleteConfirmation.Show();
+    }
+
+    private void ShowKeyContent(Device device)
+    {
+        devPubKeyContent.HeaderContent = "Device's public key";
+        devPubKeyContent.BodyContent = device.DevPubKey == null ? "" : device.DevPubKey;
+        devPubKeyContent.Show();
     }
 
     private async Task DeleteDevice(Object o)
